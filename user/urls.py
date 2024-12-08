@@ -1,17 +1,18 @@
 from django.urls import path
-from .views import RegisterView, LoginView
-from dj_rest_auth.registration.views import SocialLoginView
-from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
-from dj_rest_auth.social_serializers import GoogleLoginSerializer
-
-
-class GoogleLogin(SocialLoginView):
-    adapter_class = GoogleOAuth2Adapter
-    serializer_class = GoogleLoginSerializer
-
+from rest_framework_simplejwt.views import (
+    TokenRefreshView,
+    TokenVerifyView
+)
+from .views import (
+    UserRegistrationView,
+    UserLoginView,
+    GoogleLoginView
+)
 
 urlpatterns = [
-    path("register/", RegisterView.as_view(), name="register"),
-    path("login/", LoginView.as_view(), name="login"),
-    path("google/login/", GoogleLogin.as_view(), name="google_login"),
+    path('register/', UserRegistrationView.as_view(), name='register'),
+    path('login/', UserLoginView.as_view(), name='login'),
+    path('google-login/', GoogleLoginView.as_view(), name='google_login'),
+    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('token/verify/', TokenVerifyView.as_view(), name='token_verify'),
 ]

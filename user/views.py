@@ -1,39 +1,100 @@
-from rest_framework.views import APIView
-from rest_framework.response import Response
 from rest_framework import status
-from django.contrib.auth.models import User
-from django.contrib.auth import authenticate, login
-from rest_framework.authtoken.models import Token
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework.permissions import AllowAny
+from rest_framework_simplejwt.tokens import RefreshToken
+from django.contrib.auth import authenticate
+from google.oauth2 import id_token
+from google.auth.transport import requests
+
+from .serializers import (
+    UserRegistrationSerializer,
+    UserLoginSerializer,
+    GoogleLoginSerializer
+)
+from django.conf import settings
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 
-class RegisterView(APIView):
+class UserRegistrationView(APIView):
+    permission_classes = [AllowAny]
+
     def post(self, request):
-        email = request.data.get("email")
-        password = request.data.get("password")
-
-        if User.objects.filter(email=email).exists():
-            return Response(
-                {"error": "User with this email already exists."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        user = User.objects.create_user(
-            username=email, email=email, password=password)
-        token, _ = Token.objects.get_or_create(user=user)
-        return Response({"token": token.key}, status=status.HTTP_201_CREATED)
+        serializer = UserRegistrationSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            refresh = RefreshToken.for_user(user)
+            return Response({
+                'refresh': str(refresh),
+                'access': str(refresh.access_token),
+                'user': {'email': user.email}
+            }, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class LoginView(APIView):
+class UserLoginView(APIView):
+    permission_classes = [AllowAny]
+
     def post(self, request):
-        email = request.data.get("email")
-        password = request.data.get("password")
+        serializer = UserLoginSerializer(data=request.data)
+        if serializer.is_valid():
+            email = serializer.validated_data['email']
+            password = serializer.validated_data['password']
 
-        user = authenticate(request, username=email, password=password)
-        if user:
-            login(request, user)
-            token, _ = Token.objects.get_or_create(user=user)
-            return Response({"token": token.key}, status=status.HTTP_200_OK)
+            user = authenticate(request, email=email, password=password)
 
-        return Response(
-            {"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED
-        )
+            if user:
+                refresh = RefreshToken.for_user(user)
+                return Response({
+                    'refresh': str(refresh),
+                    'access': str(refresh.access_token),
+                    'user': {'email': user.email}
+                })
+
+            return Response({
+                'error': 'Invalid credentials'
+            }, status=status.HTTP_401_UNAUTHORIZED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class GoogleLoginView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        serializer = GoogleLoginSerializer(data=request.data)
+        if serializer.is_valid():
+            try:
+                # Verify Google ID Token
+                id_info = id_token.verify_oauth2_token(
+                    serializer.validated_data['id_token'],
+                    requests.Request(),
+                    settings.GOOGLE_CLIENT_ID
+                )
+
+                # Check if user exists or create new
+                user, created = User.objects.get_or_create(
+                    google_id=id_info['sub'],
+                    defaults={
+                        'email': id_info['email'],
+                        'is_active': True
+                    }
+                )
+
+                # Generate tokens
+                refresh = RefreshToken.for_user(user)
+                return Response({
+                    'refresh': str(refresh),
+                    'access': str(refresh.access_token),
+                    'user': {'email': user.email, 'is_new': created}
+                })
+
+            except ValueError:
+                return Response(
+                    {'error': 'Invalid Google token'},
+                    status=status.HTTP_401_UNAUTHORIZED
+                )
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

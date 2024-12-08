@@ -1,5 +1,7 @@
-from pathlib import Path
 import os
+from datetime import timedelta
+from pathlib import Path
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -21,13 +23,9 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     # -----------------
-    "corsheaders",
-    "dj_rest_auth",
-    "allauth",
-    "allauth.account",
-    "allauth.socialaccount",
-    "allauth.socialaccount.providers.google",
-    "rest_framework",
+    'rest_framework',
+    'rest_framework_simplejwt',
+    'corsheaders',
     # -----------------
     "user",
     "profiles",
@@ -36,14 +34,11 @@ INSTALLED_APPS = [
 
 
 REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES": [
-        "rest_framework.authentication.SessionAuthentication",
-        "rest_framework.authentication.TokenAuthentication",
-    ],
-    "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.AllowAny",
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
 }
+
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -54,7 +49,6 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "allauth.account.middleware.AccountMiddleware",
 ]
 
 ROOT_URLCONF = "core.urls"
@@ -92,27 +86,6 @@ DATABASES = {
         "NAME": BASE_DIR / "db.sqlite3",
     }
 }
-
-
-ACCOUNT_USER_MODEL_USERNAME_FIELD = None
-ACCOUNT_USERNAME_REQUIRED = False
-ACCOUNT_AUTHENTICATION_METHOD = "email"
-ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_UNIQUE_EMAIL = True
-
-SITE_ID = 1
-
-# SOCIALACCOUNT_PROVIDERS = {
-#     "google": {
-#         "SCOPE": ["profile", "email"],
-#         "AUTH_PARAMS": {"access_type": "online"},
-#         "APP": {
-#             "client_id": "441487544545-kmj3u1q48n9quk02c0tu1bpn1adms92e.apps.googleusercontent.com",
-#             "secret": "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",
-#             "key": "",
-#         },
-#     }
-# }
 
 
 # Password validation
@@ -160,4 +133,10 @@ STATIC_URL = "static/"
 
 AUTH_USER_MODEL = "user.CustomUser"
 
-SOCIALACCOUNT_ADAPTER = "user.adapters.CustomSocialAccountAdapter"
+GOOGLE_CLIENT_ID = '441487544545-kmj3u1q48n9quk02c0tu1bpn1adms92e.apps.googleusercontent.com'
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ROTATE_REFRESH_TOKENS': True,
+}
