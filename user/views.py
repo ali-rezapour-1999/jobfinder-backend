@@ -67,14 +67,12 @@ class GoogleLoginView(APIView):
         serializer = GoogleLoginSerializer(data=request.data)
         if serializer.is_valid():
             try:
-                # Verify Google ID Token
                 id_info = id_token.verify_oauth2_token(
                     serializer.validated_data['id_token'],
                     requests.Request(),
                     settings.GOOGLE_CLIENT_ID
                 )
 
-                # Check if user exists or create new
                 user, created = User.objects.get_or_create(
                     google_id=id_info['sub'],
                     defaults={
@@ -83,7 +81,6 @@ class GoogleLoginView(APIView):
                     }
                 )
 
-                # Generate tokens
                 refresh = RefreshToken.for_user(user)
                 return Response({
                     'refresh': str(refresh),
