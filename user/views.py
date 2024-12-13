@@ -54,7 +54,7 @@ class UserLoginView(APIView):
                 })
 
             return Response({
-                'error': 'Invalid credentials'
+                'error': 'ایمیل یا رمز عبور درست وارد نکردی'
             }, status=status.HTTP_401_UNAUTHORIZED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
