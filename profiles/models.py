@@ -4,6 +4,7 @@ from user.models import CustomUser
 from core.utils import generate_unique_id
 from django.core.exceptions import ValidationError
 from user.models import BaseModel
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 
 def validate_iranian_phone_number(value):
@@ -43,13 +44,15 @@ class Profile(BaseModel):
         ("O", "Other"),
     ]
 
-    slug_id = models.CharField(max_length=8, unique=True, default=generate_unique_id)
+    slug_id = models.CharField(
+        max_length=8, unique=True, default=generate_unique_id)
     user = models.OneToOneField(
         CustomUser, on_delete=models.CASCADE, related_name="profile"
     )
     first_name = models.CharField(max_length=100, blank=True)
     last_name = models.CharField(max_length=100, blank=True)
-    nickname = models.CharField(max_length=100, unique=True, null=True, blank=True)
+    nickname = models.CharField(
+        max_length=100, unique=True, null=True, blank=True)
     phone_number = models.CharField(
         max_length=11,
         unique=True,
@@ -100,19 +103,22 @@ class WorkHistory(BaseModel):
         verbose_name_plural = "WorkHistory"
 
 
-class Education(BaseModel):
+class UserSkill(BaseModel):
     user = models.ForeignKey(
-        CustomUser, on_delete=models.CASCADE, related_name="education_entries"
+        CustomUser, on_delete=models.CASCADE, related_name="user_skills"
     )
-    institution_name = models.CharField(max_length=200)
-    degree = models.CharField(max_length=200)
-    field_of_study = models.CharField(max_length=200, blank=True, null=True)
-    start_date = models.DateField()
-    end_date = models.DateField(null=True, blank=True)
+    skill_reference = models.ManyToManyField(
+        Skill, related_name="related_skill"
+    )
+    level = models.DecimalField(
+        max_digits=5,
+        decimal_places=1,
+        validators=[MinValueValidator(0), MaxValueValidator(100)],
+    )
 
     def __str__(self):
-        return f"{self.degree} from {self.institution_name}"
+        return f"{self.user} - {self.skill_reference}"
 
     class Meta:
-        verbose_name = "Education"
-        verbose_name_plural = "Education"
+        verbose_name = "UserSkill"
+        verbose_name_plural = "UserSkills"

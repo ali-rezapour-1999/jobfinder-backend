@@ -1,9 +1,8 @@
 from rest_framework import viewsets, permissions
-from .models import Profile, WorkHistory, Education, Skill
+from .models import Profile, WorkHistory, Skill
 from .serializers import (
     ProfileSerializer,
     WorkHistorySerializer,
-    EducationSerializer,
     SkillSerializer
 )
 
@@ -21,14 +20,7 @@ class WorkHistoryViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.AllowAny]
 
 
-class EducationViewSet(viewsets.ModelViewSet):
-    queryset = Education.objects.all()
-    serializer_class = EducationSerializer
-    permission_classes = [permissions.AllowAny]
-
-
 class SkillViewSet(viewsets.ModelViewSet):
     queryset = Skill.objects.all()
     serializer_class = SkillSerializer
     permission_classes = [permissions.AllowAny]
-
