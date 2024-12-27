@@ -11,6 +11,6 @@ class JobAdmin(admin.ModelAdmin):
 #this for test in my file
 @admin.register(SkillNeeded)
 class SkillNeededAdmin(admin.ModelAdmin):
-    list_display = ('slug_id', 'title', 'level')
+    list_display = ('slug_name', 'title', 'level')
     search_fields = ('title', 'slug_id')
     list_filter = ('level',)
