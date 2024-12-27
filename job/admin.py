@@ -4,7 +4,7 @@ from job.models import Job, SkillNeeded
 
 @admin.register(Job)
 class JobAdmin(admin.ModelAdmin):
-    list_display = ('slug_id', 'title', 'user')
+    list_display = ('slug_id_registertin', 'title', 'user')
     search_fields = ('title', 'slug_id')
     list_filter = ('user',)
 
