@@ -26,6 +26,7 @@ class SkillNeeded(BaseModel):
         return f"{self.title} and {self.job}" 
 
 
+#this for my test how can fixed this error 
 class JobOptions(BaseModel):
     job = models.ManyToManyField(Job , related_name="job_options")
     title= models.CharField(max_length=255)
