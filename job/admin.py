@@ -8,7 +8,7 @@ class JobAdmin(admin.ModelAdmin):
     search_fields = ('title', 'slug_id')
     list_filter = ('user',)
 
-
+#this for test in my file
 @admin.register(SkillNeeded)
 class SkillNeededAdmin(admin.ModelAdmin):
     list_display = ('slug_id', 'title', 'level')
