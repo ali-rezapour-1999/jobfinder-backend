@@ -30,7 +30,7 @@ class SocialMedia(BaseModel):
     linkedin = models.URLField(null=True, blank=True)
     github = models.URLField(null=True, blank=True)
     gitlab = models.URLField(null=True, blank=True)
-    gitbe = models.URLField(null=True, blank=True)
+    website = models.URLField(null=True, blank=True)
 
     class Meta:
         verbose_name = "SocialMedia"

@@ -3,7 +3,7 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from .models import CustomUser
 from django.utils.translation import gettext_lazy as _
 
-
+@admin.register(CustomUser)
 class CustomUserAdmin(BaseUserAdmin):
     fieldsets = (
         (
@@ -36,6 +36,3 @@ class CustomUserAdmin(BaseUserAdmin):
     list_display = ("email", "slug_id", "is_staff", "is_active")
     search_fields = ("email",)
     ordering = ("email",)
-
-
-admin.site.register(CustomUser, CustomUserAdmin)

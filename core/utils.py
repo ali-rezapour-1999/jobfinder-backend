@@ -1,5 +1,4 @@
-import random
-
+from django.forms.fields import uuid
 
 def generate_unique_id():
-    return str(random.randint(10000000, 99999999))
+    return str(uuid.uuid4())[:8]
