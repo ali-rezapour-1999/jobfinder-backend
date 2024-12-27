@@ -16,8 +16,7 @@ class CustomUserAdmin(BaseUserAdmin):
             },
         ),
         (_("Personal info"), {"fields": ()}),
-        (_("Permissions"), {
-         "fields": ("is_active", "is_staff", "is_superuser")}),
+        (_("Permissions"), {"fields": ("is_active", "is_staff", "is_superuser")}),
         (_("Important dates"), {"fields": ("last_login",)}),
     )
     readonly_fields = (
