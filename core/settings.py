@@ -2,7 +2,6 @@ import os
 from datetime import timedelta
 from pathlib import Path
 
-
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
@@ -22,19 +21,20 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     # -----------------
-    'rest_framework',
-    'rest_framework_simplejwt',
-    'corsheaders',
+    "rest_framework",
+    "rest_framework_simplejwt",
+    "corsheaders",
     # -----------------
     "user",
     "profiles",
     "job",
+    "jobRequest",
 ]
 
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
     ],
 }
 
@@ -132,10 +132,12 @@ STATIC_URL = "static/"
 
 AUTH_USER_MODEL = "user.CustomUser"
 
-GOOGLE_CLIENT_ID = '441487544545-kmj3u1q48n9quk02c0tu1bpn1adms92e.apps.googleusercontent.com'
+GOOGLE_CLIENT_ID = (
+    "441487544545-kmj3u1q48n9quk02c0tu1bpn1adms92e.apps.googleusercontent.com"
+)
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
-    'ROTATE_REFRESH_TOKENS': True,
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "ROTATE_REFRESH_TOKENS": True,
 }

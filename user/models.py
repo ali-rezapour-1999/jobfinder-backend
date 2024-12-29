@@ -34,9 +34,7 @@ class CustomUserManager(BaseUserManager):
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
     slug_id = models.CharField(max_length=8, unique=True, default=generate_unique_id)
-    email = models.EmailField(
-        unique=True,
-    )
+    email = models.EmailField( unique=True,)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
