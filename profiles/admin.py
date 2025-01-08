@@ -31,6 +31,7 @@ class ProfileAdmin(admin.ModelAdmin):
                     "user",
                     "first_name",
                     "last_name",
+                    "username",
                     "phone_number",
                     "age",
                     "gender",

@@ -51,7 +51,7 @@ class Profile(BaseModel):
     )
     first_name = models.CharField(max_length=100, blank=True)
     last_name = models.CharField(max_length=100, blank=True)
-    nickname = models.CharField(max_length=100, unique=True, null=True, blank=True)
+    username = models.CharField(max_length=100, unique=True, null=True, blank=True)
     phone_number = models.CharField(
         max_length=11,
         unique=True,
