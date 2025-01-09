@@ -1,9 +1,9 @@
+import logging
 import os
 from datetime import timedelta
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 SECRET_KEY = "django-insecure-=kgj-r@@v+6neh1-9*vgd=@#q9()5n(o^fq(70)b8vs4%c%co!"
 
@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     "profiles",
     "job",
     "jobRequest",
+    "log",
 ]
 
 
@@ -48,6 +49,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "log.middleware.ErrorLoggingMiddleware",
 ]
 
 ROOT_URLCONF = "core.urls"
@@ -115,12 +117,7 @@ USE_I18N = True
 
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-
 STATIC_URL = "static/"
-
-# Default primary key field type
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
