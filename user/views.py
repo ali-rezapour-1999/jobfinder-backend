@@ -1,19 +1,17 @@
+from django.conf import settings
+from django.contrib.auth import authenticate, get_user_model
+from google.auth.transport import requests
+from google.oauth2 import id_token
 from rest_framework import status
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
-from django.contrib.auth import authenticate
-from google.oauth2 import id_token
-from google.auth.transport import requests
 
-from .serializers import (
-    UserRegistrationSerializer,
-    UserLoginSerializer,
-    GoogleLoginSerializer
-)
-from django.conf import settings
-from django.contrib.auth import get_user_model
+from log.models import ErrorLog, RestLog
+
+from .serializers import (GoogleLoginSerializer, UserLoginSerializer,
+                          UserRegistrationSerializer)
 
 User = get_user_model()
 
@@ -26,11 +24,34 @@ class UserRegistrationView(APIView):
         if serializer.is_valid():
             user = serializer.save()
             refresh = RefreshToken.for_user(user)
-            return Response({
-                'refresh': str(refresh),
-                'access': str(refresh.access_token),
-                'user': {'email': user.email}
-            }, status=status.HTTP_201_CREATED)
+
+            RestLog.objects.create(
+                user=user,
+                action="User Registration",
+                request_data=request.data,
+                response_data={
+                    "refresh": str(refresh),
+                    "access": str(refresh.access_token),
+                    "user": {"email": user.email},
+                },
+            )
+
+            return Response(
+                {
+                    "refresh": str(refresh),
+                    "access": str(refresh.access_token),
+                    "user": {"email": user.email},
+                },
+                status=status.HTTP_201_CREATED,
+            )
+
+        # Log registration error
+        ErrorLog.objects.create(
+            user=None,
+            error_message="User registration failed",
+            request_data=request.data,
+        )
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -40,22 +61,52 @@ class UserLoginView(APIView):
     def post(self, request):
         serializer = UserLoginSerializer(data=request.data)
         if serializer.is_valid():
-            email = serializer.validated_data['email']
-            password = serializer.validated_data['password']
+            email = serializer.validated_data["email"]
+            password = serializer.validated_data["password"]
 
             user = authenticate(request, email=email, password=password)
 
             if user:
                 refresh = RefreshToken.for_user(user)
-                return Response({
-                    'refresh': str(refresh),
-                    'access': str(refresh.access_token),
-                    'user': {'email': user.email, 'slug': user.slug_id},
-                })
 
-            return Response({
-                'error': 'ایمیل یا رمز عبور درست وارد نکردی'
-            }, status=status.HTTP_401_UNAUTHORIZED)
+                # Log successful login
+                RestLog.objects.create(
+                    user=user,
+                    action="User Login",
+                    request_data=request.data,
+                    response_data={
+                        "refresh": str(refresh),
+                        "access": str(refresh.access_token),
+                        "user": {"email": user.email, "slug": user.slug_id},
+                    },
+                )
+
+                return Response(
+                    {
+                        "refresh": str(refresh),
+                        "access": str(refresh.access_token),
+                        "user": {"email": user.email, "slug": user.slug_id},
+                    }
+                )
+
+            # Log failed login attempt
+            ErrorLog.objects.create(
+                user=None,
+                error_message="Invalid email or password",
+                request_data=request.data,
+            )
+
+            return Response(
+                {"error": "ایمیل یا رمز عبور درست وارد نکردی"},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+
+        # Log invalid login request
+        ErrorLog.objects.create(
+            user=None,
+            error_message="Invalid login request data",
+            request_data=serializer.errors,
+        )
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -68,30 +119,54 @@ class GoogleLoginView(APIView):
         if serializer.is_valid():
             try:
                 id_info = id_token.verify_oauth2_token(
-                    serializer.validated_data['id_token'],
+                    serializer.validated_data["id_token"],
                     requests.Request(),
-                    settings.GOOGLE_CLIENT_ID
+                    settings.GOOGLE_CLIENT_ID,
                 )
 
                 user, created = User.objects.get_or_create(
-                    google_id=id_info['sub'],
-                    defaults={
-                        'email': id_info['email'],
-                        'is_active': True
-                    }
+                    google_id=id_info["sub"],
+                    defaults={"email": id_info["email"], "is_active": True},
                 )
 
                 refresh = RefreshToken.for_user(user)
-                return Response({
-                    'refresh': str(refresh),
-                    'access': str(refresh.access_token),
-                    'user': {'email': user.email, 'is_new': created}
-                })
 
-            except ValueError:
-                return Response(
-                    {'error': 'Invalid Google token'},
-                    status=status.HTTP_401_UNAUTHORIZED
+                # Log successful Google login
+                RestLog.objects.create(
+                    user=user,
+                    action="Google Login",
+                    request_data=request.data,
+                    response_data={
+                        "refresh": str(refresh),
+                        "access": str(refresh.access_token),
+                        "user": {"email": user.email, "is_new": created},
+                    },
                 )
+
+                return Response(
+                    {
+                        "refresh": str(refresh),
+                        "access": str(refresh.access_token),
+                        "user": {"email": user.email, "is_new": created},
+                    }
+                )
+
+            except ValueError as e:
+                ErrorLog.objects.create(
+                    user=None,
+                    error_message="Invalid Google token",
+                    stack_trace=str(e),
+                    request_data=request.data,
+                )
+                return Response(
+                    {"error": "Invalid Google token"},
+                    status=status.HTTP_401_UNAUTHORIZED,
+                )
+
+        ErrorLog.objects.create(
+            user=None,
+            error_message="Invalid Google login request data",
+            request_data=serializer.errors,
+        )
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
