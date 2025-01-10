@@ -5,11 +5,11 @@ from .models import ErrorLog, RestLog
 
 @admin.register(ErrorLog)
 class ErrorLogAdmin(admin.ModelAdmin):
-    list_display = ("timestamp", "message")
-    search_fields = ("message",)
+    list_display = ("timestamp", "error_message")
+    search_fields = ("error_message",)
 
 
 @admin.register(RestLog)
 class RestLogAdmin(admin.ModelAdmin):
-    list_display = ("timestamp", "user", "status_code")
-    search_fields = ("status_code",)
+    list_display = ("timestamp", "user", "action")
+    search_fields = ("action",)
