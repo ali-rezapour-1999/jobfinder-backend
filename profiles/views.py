@@ -11,7 +11,7 @@ class ProfileViewSet(viewsets.ModelViewSet):
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
     lookup_field = "slug_id"
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
         try:
@@ -73,7 +73,7 @@ class ProfileViewSet(viewsets.ModelViewSet):
 class WorkHistoryViewSet(viewsets.ModelViewSet):
     queryset = WorkHistory.objects.all()
     serializer_class = WorkHistorySerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
         try:
@@ -135,7 +135,7 @@ class WorkHistoryViewSet(viewsets.ModelViewSet):
 class SkillViewSet(viewsets.ModelViewSet):
     queryset = Skill.objects.all()
     serializer_class = SkillSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
         try:

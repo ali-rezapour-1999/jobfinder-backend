@@ -1,18 +1,25 @@
 from rest_framework import serializers
-from .models import Profile, WorkHistory,  Skill
+
+from .models import Profile, Skill, WorkHistory
 
 
 class SkillSerializer(serializers.ModelSerializer):
     class Meta:
         model = Skill
-        fields = ['id', 'name']
+        fields = ["id", "name"]
 
 
 class WorkHistorySerializer(serializers.ModelSerializer):
     class Meta:
         model = WorkHistory
-        fields = ['id', 'job_title', 'company_name',
-                  'start_date', 'end_date', 'job_description']
+        fields = [
+            "id",
+            "job_title",
+            "company_name",
+            "start_date",
+            "end_date",
+            "job_description",
+        ]
 
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -21,4 +28,4 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = '__all__'
+        fields = "__all__"
