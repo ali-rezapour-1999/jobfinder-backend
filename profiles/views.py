@@ -1,5 +1,4 @@
 from rest_framework import permissions, viewsets
-from rest_framework.exceptions import ValidationError
 
 from log.models import ErrorLog, RestLog
 
@@ -12,47 +11,61 @@ class ProfileViewSet(viewsets.ModelViewSet):
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
     lookup_field = "slug_id"
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
 
-    def list(self, request, *args, **kwargs):
+    def perform_create(self, serializer):
         try:
-            response = super().list(request, *args, **kwargs)
+            profile = serializer.save()
 
             RestLog.objects.create(
-                user=request.user if request.user.is_authenticated else None,
-                action="Profile List View",
-                request_data=request.query_params.dict(),
-                response_data=response.data,
+                user=self.request.user if self.request.user.is_authenticated else None,
+                action="Profile Created",
+                request_data=self.request.data,
+                response_data=ProfileSerializer(profile).data,
             )
-            return response
-
-        except ValidationError as e:
-
+        except Exception as e:
             ErrorLog.objects.create(
-                user=request.user if request.user.is_authenticated else None,
-                error_message="Validation error in Profile list",
+                user=self.request.user if self.request.user.is_authenticated else None,
+                error_message="Profile creation failed",
                 stack_trace=str(e),
-                request_data=request.query_params.dict(),
+                request_data=self.request.data,
             )
             raise e
 
-    def create(self, request, *args, **kwargs):
+    def perform_update(self, serializer):
         try:
-            response = super().create(request, *args, **kwargs)
-            RestLog.objects.create(
-                user=request.user if request.user.is_authenticated else None,
-                action="Profile Create View",
-                request_data=request.data,
-                response_data=response.data,
-            )
-            return response
+            profile = serializer.save()
 
-        except ValidationError as e:
+            RestLog.objects.create(
+                user=self.request.user if self.request.user.is_authenticated else None,
+                action="Profile Updated",
+                request_data=self.request.data,
+                response_data=ProfileSerializer(profile).data,
+            )
+        except Exception as e:
             ErrorLog.objects.create(
-                user=request.user if request.user.is_authenticated else None,
-                error_message="Validation error in Profile create",
+                user=self.request.user if self.request.user.is_authenticated else None,
+                error_message="Profile update failed",
                 stack_trace=str(e),
-                request_data=request.data,
+                request_data=self.request.data,
+            )
+            raise e
+
+    def perform_destroy(self, instance):
+        try:
+            instance.delete()
+            RestLog.objects.create(
+                user=self.request.user if self.request.user.is_authenticated else None,
+                action="Profile Deleted",
+                request_data=self.request.data,
+                response_data={"slug_id": instance.slug_id},
+            )
+        except Exception as e:
+            ErrorLog.objects.create(
+                user=self.request.user if self.request.user.is_authenticated else None,
+                error_message="Profile deletion failed",
+                stack_trace=str(e),
+                request_data=self.request.data,
             )
             raise e
 
@@ -62,45 +75,59 @@ class WorkHistoryViewSet(viewsets.ModelViewSet):
     serializer_class = WorkHistorySerializer
     permission_classes = [permissions.AllowAny]
 
-    def list(self, request, *args, **kwargs):
+    def perform_create(self, serializer):
         try:
-            response = super().list(request, *args, **kwargs)
+            work_history = serializer.save()
 
             RestLog.objects.create(
-                user=request.user if request.user.is_authenticated else None,
-                action="Work History List View",
-                request_data=request.query_params.dict(),
-                response_data=response.data,
+                user=self.request.user if self.request.user.is_authenticated else None,
+                action="Work History Created",
+                request_data=self.request.data,
+                response_data=WorkHistorySerializer(work_history).data,
             )
-            return response
-
-        except ValidationError as e:
+        except Exception as e:
             ErrorLog.objects.create(
-                user=request.user if request.user.is_authenticated else None,
-                error_message="Validation error in Work History list",
+                user=self.request.user if self.request.user.is_authenticated else None,
+                error_message="Work history creation failed",
                 stack_trace=str(e),
-                request_data=request.query_params.dict(),
+                request_data=self.request.data,
             )
-            raise e  # Re-raise the error after logging
+            raise e
 
-    def create(self, request, *args, **kwargs):
+    def perform_update(self, serializer):
         try:
-            response = super().create(request, *args, **kwargs)
+            work_history = serializer.save()
 
             RestLog.objects.create(
-                user=request.user if request.user.is_authenticated else None,
-                action="Work History Create View",
-                request_data=request.data,
-                response_data=response.data,
+                user=self.request.user if self.request.user.is_authenticated else None,
+                action="Work History Updated",
+                request_data=self.request.data,
+                response_data=WorkHistorySerializer(work_history).data,
             )
-            return response
-
-        except ValidationError as e:
+        except Exception as e:
             ErrorLog.objects.create(
-                user=request.user if request.user.is_authenticated else None,
-                error_message="Validation error in Work History create",
+                user=self.request.user if self.request.user.is_authenticated else None,
+                error_message="Work history update failed",
                 stack_trace=str(e),
-                request_data=request.data,
+                request_data=self.request.data,
+            )
+            raise e
+
+    def perform_destroy(self, instance):
+        try:
+            instance.delete()
+            RestLog.objects.create(
+                user=self.request.user if self.request.user.is_authenticated else None,
+                action="Work History Deleted",
+                request_data=self.request.data,
+                response_data={"id": instance.id},
+            )
+        except Exception as e:
+            ErrorLog.objects.create(
+                user=self.request.user if self.request.user.is_authenticated else None,
+                error_message="Work history deletion failed",
+                stack_trace=str(e),
+                request_data=self.request.data,
             )
             raise e
 
@@ -110,44 +137,56 @@ class SkillViewSet(viewsets.ModelViewSet):
     serializer_class = SkillSerializer
     permission_classes = [permissions.AllowAny]
 
-    def list(self, request, *args, **kwargs):
+    def perform_create(self, serializer):
         try:
-            response = super().list(request, *args, **kwargs)
-
+            skill = serializer.save()
             RestLog.objects.create(
-                user=request.user if request.user.is_authenticated else None,
-                action="Skill List View",
-                request_data=request.query_params.dict(),
-                response_data=response.data,
+                user=self.request.user if self.request.user.is_authenticated else None,
+                action="Skill Created",
+                request_data=self.request.data,
+                response_data=SkillSerializer(skill).data,
             )
-            return response
-
-        except ValidationError as e:
+        except Exception as e:
             ErrorLog.objects.create(
-                user=request.user if request.user.is_authenticated else None,
-                error_message="Validation error in Skill list",
+                user=self.request.user if self.request.user.is_authenticated else None,
+                error_message="Skill creation failed",
                 stack_trace=str(e),
-                request_data=request.query_params.dict(),
+                request_data=self.request.data,
             )
             raise e
 
-    def create(self, request, *args, **kwargs):
+    def perform_update(self, serializer):
         try:
-            response = super().create(request, *args, **kwargs)
-
+            skill = serializer.save()
             RestLog.objects.create(
-                user=request.user if request.user.is_authenticated else None,
-                action="Skill Create View",
-                request_data=request.data,
-                response_data=response.data,
+                user=self.request.user if self.request.user.is_authenticated else None,
+                action="Skill Updated",
+                request_data=self.request.data,
+                response_data=SkillSerializer(skill).data,
             )
-            return response
-
-        except ValidationError as e:
+        except Exception as e:
             ErrorLog.objects.create(
-                user=request.user if request.user.is_authenticated else None,
-                error_message="Validation error in Skill create",
+                user=self.request.user if self.request.user.is_authenticated else None,
+                error_message="Skill update failed",
                 stack_trace=str(e),
-                request_data=request.data,
+                request_data=self.request.data,
+            )
+            raise e
+
+    def perform_destroy(self, instance):
+        try:
+            instance.delete()
+            RestLog.objects.create(
+                user=self.request.user if self.request.user.is_authenticated else None,
+                action="Skill Deleted",
+                request_data=self.request.data,
+                response_data={"id": instance.id},
+            )
+        except Exception as e:
+            ErrorLog.objects.create(
+                user=self.request.user if self.request.user.is_authenticated else None,
+                error_message="Skill deletion failed",
+                stack_trace=str(e),
+                request_data=self.request.data,
             )
             raise e
