@@ -45,7 +45,6 @@ class UserRegistrationView(APIView):
                 status=status.HTTP_201_CREATED,
             )
 
-        # Log registration error
         ErrorLog.objects.create(
             user=None,
             error_message="User registration failed",
@@ -64,12 +63,25 @@ class UserLoginView(APIView):
             email = serializer.validated_data["email"]
             password = serializer.validated_data["password"]
 
+            user = User.objects.filter(email=email).first()
+
+            if not user:
+                ErrorLog.objects.create(
+                    user=None,
+                    error_message="User not found",
+                    request_data=request.data,
+                )
+
+                return Response(
+                    {"error": "NOT_FOUND"},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
+
             user = authenticate(request, email=email, password=password)
 
             if user:
                 refresh = RefreshToken.for_user(user)
 
-                # Log successful login
                 RestLog.objects.create(
                     user=user,
                     action="User Login",
@@ -89,19 +101,17 @@ class UserLoginView(APIView):
                     }
                 )
 
-            # Log failed login attempt
             ErrorLog.objects.create(
-                user=None,
-                error_message="Invalid email or password",
+                user=user,
+                error_message="Incorrect password",
                 request_data=request.data,
             )
 
             return Response(
-                {"error": "ایمیل یا رمز عبور درست وارد نکردی"},
+                {"error": "PASSWORD_INVALID"},
                 status=status.HTTP_401_UNAUTHORIZED,
             )
 
-        # Log invalid login request
         ErrorLog.objects.create(
             user=None,
             error_message="Invalid login request data",
