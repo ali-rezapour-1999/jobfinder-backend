@@ -55,6 +55,7 @@ ROOT_URLCONF = "core.urls"
 CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
+    "https://jobfinder-client-6chj.vercel.app",
 ]
 CORS_ALLOW_CREDENTIALS = True
 
