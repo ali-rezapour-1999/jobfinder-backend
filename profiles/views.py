@@ -10,7 +10,7 @@ from .serializers import (ProfileSerializer, SkillSerializer,
 class ProfileViewSet(viewsets.ModelViewSet):
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
-    lookup_field = "slug_id"
+    lookup_field = "user__slug_id"
     permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):

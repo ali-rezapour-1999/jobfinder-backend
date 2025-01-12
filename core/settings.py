@@ -1,5 +1,3 @@
-import logging
-import os
 from datetime import timedelta
 from pathlib import Path
 
@@ -54,10 +52,25 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "core.urls"
 
-CORS_ALLOW_ALL_ORIGINS = True
-
+CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
+]
+CORS_ALLOW_CREDENTIALS = True
+
+CORS_EXPOSE_HEADERS = [
+    "Content-Type",
+    "Authorization",
+    "X-CSRFToken",
+    "Strict-Transport-Security",
+]
+
+CORS_ALLOW_HEADERS = [
+    "authorization",
+    "content-type",
+    "x-csrftoken",
+    "access-control-allow-origin",
+    "strict-origin-when-cross-origin",
 ]
 
 TEMPLATES = [
