@@ -3,6 +3,7 @@ from django.db import models
 
 from core.utils import generate_unique_id , validate_iranian_phone_number
 from user.models import BaseModel, CustomUser
+from user.middleware import get_current_user
 
 
 class Profile(BaseModel):
@@ -70,6 +71,14 @@ class Skill(BaseModel):
     class Meta:
         verbose_name = "Skill"
         verbose_name_plural = "Skill"
+
+    def save(self, *args, **kwargs):
+        user = get_current_user() 
+        if not self.pk: 
+            self.create_by = user
+        self.updated_by = user
+        super().save(*args, **kwargs)
+
 
     def __str__(self):
         return self.name
