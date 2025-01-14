@@ -4,7 +4,6 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from core.utils import generate_unique_id
 from user.models import BaseModel, CustomUser
 
-
 class Job(BaseModel):
     slug_id = models.CharField(max_length=8, unique=True, default=generate_unique_id)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="user")

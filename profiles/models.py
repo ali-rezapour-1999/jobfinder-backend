@@ -1,41 +1,8 @@
-import re
-
-from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
-from core.utils import generate_unique_id
+from core.utils import generate_unique_id , validate_iranian_phone_number
 from user.models import BaseModel, CustomUser
-
-
-def validate_iranian_phone_number(value):
-    if not re.match(r"^(?:0)?9\d{9}$", value):
-        raise ValidationError("Enter a valid Iranian phone number.")
-
-
-class Skill(BaseModel):
-    name = models.CharField(max_length=100, unique=True)
-
-    class Meta:
-        verbose_name = "Skill"
-        verbose_name_plural = "Skill"
-
-    def __str__(self):
-        return self.name
-
-
-class SocialMedia(BaseModel):
-    telegram = models.URLField(null=True, blank=True)
-    instagram = models.URLField(null=True, blank=True)
-    twitter = models.URLField(null=True, blank=True)
-    linkedin = models.URLField(null=True, blank=True)
-    github = models.URLField(null=True, blank=True)
-    gitlab = models.URLField(null=True, blank=True)
-    website = models.URLField(null=True, blank=True)
-
-    class Meta:
-        verbose_name = "SocialMedia"
-        verbose_name_plural = "SocialMedia"
 
 
 class Profile(BaseModel):
@@ -71,11 +38,6 @@ class Profile(BaseModel):
         upload_to="profile_images/", null=True, blank=True
     )
 
-    skills = models.ManyToManyField(Skill, related_name="profiles", blank=True)
-    socialmedia = models.ManyToManyField(
-        SocialMedia, related_name="socialmedia", blank=True
-    )
-
     def __str__(self):
         return f"{self.first_name} {self.last_name} - {self.username}"
 
@@ -102,6 +64,17 @@ class WorkHistory(BaseModel):
         verbose_name_plural = "WorkHistory"
 
 
+class Skill(BaseModel):
+    name = models.CharField(max_length=100, unique=True)
+
+    class Meta:
+        verbose_name = "Skill"
+        verbose_name_plural = "Skill"
+
+    def __str__(self):
+        return self.name
+
+
 class UserSkill(BaseModel):
     user = models.ForeignKey(
         CustomUser, on_delete=models.CASCADE, related_name="user_skills"
@@ -119,3 +92,22 @@ class UserSkill(BaseModel):
     class Meta:
         verbose_name = "UserSkill"
         verbose_name_plural = "UserSkills"
+
+
+
+class SocialMedia(BaseModel):
+    user = models.ForeignKey(CustomUser , on_delete=models.CASCADE , related_name='socialMedia')
+    telegram = models.URLField(null=True, blank=True)
+    instagram = models.URLField(null=True, blank=True)
+    twitter = models.URLField(null=True, blank=True)
+    linkedin = models.URLField(null=True, blank=True)
+    github = models.URLField(null=True, blank=True)
+    gitlab = models.URLField(null=True, blank=True)
+    website = models.URLField(null=True, blank=True)
+
+    class Meta:
+        verbose_name = "SocialMedia"
+        verbose_name_plural = "SocialMedia"
+
+    def __str__(self):
+        return f"{self.user}"

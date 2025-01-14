@@ -40,7 +40,7 @@ class ProfileAdmin(admin.ModelAdmin):
             },
         ),
         ("Address", {"fields": ("state", "city", "address")}),
-        ("Professional Info", {"fields": ("skills", "description_myself", "cv_file")}),
+        ("Professional Info", {"fields": ("description_myself", "cv_file")}),
         ("Other Info", {"fields": ("is_active", "created_at", "updated_at")}),
     )
 
