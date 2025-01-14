@@ -52,3 +52,15 @@ class BaseModel(models.Model):
 
     class Mete:
         abstract = True
+
+        
+class UserDeviceInfo(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=True)
+    browser = models.CharField(max_length=100, blank=True, null=True)
+    os = models.CharField(max_length=100, blank=True, null=True)
+    device = models.CharField(max_length=100, blank=True, null=True)
+    user_agent = models.TextField(blank=True, null=True)
+    see_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user} - {self.device} - {self.created_at}"

@@ -6,7 +6,9 @@ from rest_framework_simplejwt.views import (
 from .views import (
     UserRegistrationView,
     UserLoginView,
-    GoogleLoginView
+    GoogleLoginView,
+    SaveDeviceInfoView
+    
 )
 
 urlpatterns = [
@@ -15,4 +17,5 @@ urlpatterns = [
     path('google-login/', GoogleLoginView.as_view(), name='google_login'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('token/verify/', TokenVerifyView.as_view(), name='token_verify'),
+    path('api/save-device-info/', SaveDeviceInfoView.as_view(), name='save_device_info'),
 ]
