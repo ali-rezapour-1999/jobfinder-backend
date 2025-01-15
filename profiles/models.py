@@ -54,7 +54,7 @@ class WorkHistory(BaseModel):
     )
     job_title = models.CharField(max_length=200, blank=True)
     company_name = models.CharField(max_length=200, blank=True)
-    start_date = models.DateField(blank=True)
+    start_date = models.DateField(blank=True , null=True)
     end_date = models.DateField(null=True, blank=True)
     job_description = models.TextField(blank=True, null=True)
 
@@ -95,6 +95,7 @@ class UserSkill(BaseModel):
         max_digits=5,
         decimal_places=1,
         validators=[MinValueValidator(0), MaxValueValidator(100)],
+        null=True, blank=True
     )
 
     def __str__(self):
