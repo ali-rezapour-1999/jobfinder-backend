@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import ErrorLog, RestLog
+from .models import ErrorLog, RestLog, UserDeviceInfo
 
 
 @admin.register(ErrorLog)
@@ -13,3 +13,9 @@ class ErrorLogAdmin(admin.ModelAdmin):
 class RestLogAdmin(admin.ModelAdmin):
     list_display = ("timestamp", "user", "action")
     search_fields = ("action",)
+
+
+@admin.register(UserDeviceInfo)
+class ErrorLogAdmin(admin.ModelAdmin):
+    list_display = ("ip_address", "device_type")
+    search_fields = ("ip_address","timezone" ,"user_agent" , "os")
