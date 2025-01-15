@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Profile, Skill, WorkHistory
+from .models import Profile, Review, Skill, WorkHistory
 
 
 class SkillSerializer(serializers.ModelSerializer):
@@ -33,3 +33,13 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     def get_email(self, obj):
         return obj.user.email if obj.user else None
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    total_likes = serializers.IntegerField(source='total_likes', read_only=True)
+    total_dislikes = serializers.IntegerField(source='total_dislikes', read_only=True)
+
+    class Meta:
+        model = Review
+        fields = ['id', 'user', 'likes', 'dislikes', 'total_likes', 'total_dislikes']
+        read_only_fields = ['total_likes', 'total_dislikes']

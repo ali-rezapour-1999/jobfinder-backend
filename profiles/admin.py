@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Profile, Skill, SocialMedia, UserSkill, WorkHistory
+from .models import Profile, Review, Skill, SocialMedia, UserSkill, WorkHistory
 
 
 @admin.register(SocialMedia)
@@ -77,4 +77,14 @@ class UserSkillAdmin(admin.ModelAdmin):
     search_fields = (
         "user",
         "skill",
+    )
+
+
+@admin.register(Review)
+class ReviewAdmin(admin.ModelAdmin):
+    list_display = (
+        "user",
+    )
+    search_fields = (
+        "user",
     )

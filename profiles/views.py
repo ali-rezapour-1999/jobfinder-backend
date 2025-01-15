@@ -1,10 +1,10 @@
-from rest_framework import permissions, viewsets
-
+from django.db import transaction
+from rest_framework import permissions, viewsets, status
+from rest_framework.response import Response
+from rest_framework.decorators import action
 from log.models import ErrorLog, RestLog
-
-from .models import Profile, Skill, WorkHistory
-from .serializers import (ProfileSerializer, SkillSerializer,
-                          WorkHistorySerializer)
+from .models import Profile, Review, Skill, WorkHistory
+from .serializers import ProfileSerializer, ReviewSerializer, SkillSerializer, WorkHistorySerializer
 
 
 class ProfileViewSet(viewsets.ModelViewSet):
@@ -16,7 +16,6 @@ class ProfileViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         try:
             profile = serializer.save()
-
             RestLog.objects.create(
                 user=self.request.user if self.request.user.is_authenticated else None,
                 action="Profile Created",
@@ -35,7 +34,6 @@ class ProfileViewSet(viewsets.ModelViewSet):
     def perform_update(self, serializer):
         try:
             profile = serializer.save()
-
             RestLog.objects.create(
                 user=self.request.user if self.request.user.is_authenticated else None,
                 action="Profile Updated",
@@ -78,7 +76,6 @@ class WorkHistoryViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         try:
             work_history = serializer.save()
-
             RestLog.objects.create(
                 user=self.request.user if self.request.user.is_authenticated else None,
                 action="Work History Created",
@@ -97,7 +94,6 @@ class WorkHistoryViewSet(viewsets.ModelViewSet):
     def perform_update(self, serializer):
         try:
             work_history = serializer.save()
-
             RestLog.objects.create(
                 user=self.request.user if self.request.user.is_authenticated else None,
                 action="Work History Updated",
@@ -190,3 +186,32 @@ class SkillViewSet(viewsets.ModelViewSet):
                 request_data=self.request.data,
             )
             raise e
+
+
+class ReviewViewSet(viewsets.ModelViewSet):
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def _toggle_reaction(self, review, user, reaction_field, opposite_field):
+        with transaction.atomic():
+            if user in getattr(review, opposite_field).all():
+                getattr(review, opposite_field).remove(user)
+            if user not in getattr(review, reaction_field).all():
+                getattr(review, reaction_field).add(user)
+            else:
+                getattr(review, reaction_field).remove(user)
+
+    @action(detail=True, methods=["post"])
+    def like(self, request, pk=None):
+        review = self.get_object()  # Automatically handles DoesNotExist
+        self._toggle_reaction(review, request.user, "likes", "dislikes")
+        serializer = self.get_serializer(review)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=["post"])
+    def dislike(self, request, pk=None):
+        review = self.get_object()
+        self._toggle_reaction(review, request.user, "dislikes", "likes")
+        serializer = self.get_serializer(review)
+        return Response(serializer.data, status=status.HTTP_200_OK)
