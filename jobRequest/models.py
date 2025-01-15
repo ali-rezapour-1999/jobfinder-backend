@@ -19,5 +19,6 @@ class JobRequest(BaseModel):
         return f"{self.user} - {self.request_job}"
 
     class Meta:
+        db_table = '"job_request"."job_request"'
         verbose_name = "Job Request"
         verbose_name_plural = "Job Requests"

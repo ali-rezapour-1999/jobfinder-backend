@@ -1,4 +1,3 @@
-import json
 from django.conf import settings
 from django.contrib.auth import authenticate, get_user_model
 from google.auth.transport import requests
@@ -8,10 +7,9 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
-from django.http import JsonResponse
-from django.views import View 
-from .models import UserDeviceInfo
+
 from log.models import ErrorLog, RestLog
+
 from .serializers import (GoogleLoginSerializer, UserLoginSerializer,
                           UserRegistrationSerializer)
 
@@ -182,31 +180,3 @@ class GoogleLoginView(APIView):
         )
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class SaveDeviceInfoView(APIView):
-    authentication_classes = []
-    permission_classes = []     
-
-    def post(self, request, *args, **kwargs):
-        try:
-            data = request.data
-            user = None
-
-            if request.user.is_authenticated:
-                user = request.user
-
-            UserDeviceInfo.objects.create(
-                user=user,
-                browser=data.get('browser'),
-                os=data.get('os'),
-                device=data.get('device'),
-                user_agent=data.get('userAgent'),
-            )
-
-            return Response({'status': 'success'}, status=status.HTTP_200_OK)
-        except Exception as e:
-            return Response({'status': 'error', 'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-
-    def get(self, request, *args, **kwargs):
-        return Response({'status': 'error', 'message': 'Invalid request method'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)

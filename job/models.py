@@ -15,6 +15,10 @@ class Job(BaseModel):
     def __str__(self):
         return f"{self.title} and {self.user}"
 
+    class Meta:
+        db_table = '"job"."job"'
+        verbose_name = "job"
+        verbose_name_plural = "job"
 
 class SkillNeeded(BaseModel):
     slug_id = models.CharField(max_length=8, unique=True, default=generate_unique_id)
@@ -30,6 +34,11 @@ class SkillNeeded(BaseModel):
     def __str__(self):
         return f"{self.title} and {self.job}"
 
+    class Meta:
+        db_table = '"job"."skill_needed"'
+        verbose_name = "job_skillneeded"
+        verbose_name_plural = "job_skillneeded"
+
 
 class JobOptions(BaseModel):
     slug_id = models.CharField(max_length=8, unique=True, default=generate_unique_id)
@@ -39,3 +48,8 @@ class JobOptions(BaseModel):
 
     def __str__(self):
         return f"{self.title} and {self.job}"
+
+    class Meta:
+        db_table = '"job"."job_options"'
+        verbose_name = "job_options"
+        verbose_name_plural = "job_options"

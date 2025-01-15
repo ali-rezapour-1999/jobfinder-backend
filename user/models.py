@@ -1,6 +1,7 @@
 from django.contrib.auth.models import (AbstractBaseUser, BaseUserManager,
                                         PermissionsMixin)
 from django.db import models
+
 from core.utils import generate_unique_id
 
 
@@ -35,6 +36,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     REQUIRED_FIELDS = []
 
     class Meta:
+        db_table = '"auth"."custom_user"'
         verbose_name = "User"
         verbose_name_plural = "User"
 
@@ -42,25 +44,24 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         return self.email
 
 
-
 class BaseModel(models.Model):
-    create_by = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True, related_name='%(class)s_creator')
-    updated_by = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True, related_name='%(class)s_last_updated_by')
+    create_by = models.ForeignKey(
+        CustomUser,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="%(class)s_create_by",
+    )
+    updated_by = models.ForeignKey(
+        CustomUser,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="%(class)s_updated_by",
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=True)
 
     class Mete:
         abstract = True
-
-        
-class UserDeviceInfo(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=True)
-    browser = models.CharField(max_length=100, blank=True, null=True)
-    os = models.CharField(max_length=100, blank=True, null=True)
-    device = models.CharField(max_length=100, blank=True, null=True)
-    user_agent = models.TextField(blank=True, null=True)
-    see_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"{self.user} - {self.device} - {self.created_at}"

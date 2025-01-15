@@ -47,8 +47,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "log.middleware.ErrorLoggingMiddleware",
-    "user.middleware.CurrentUserMiddleware"
+    "user.middleware.CurrentUserMiddleware",
 ]
 
 ROOT_URLCONF = "core.urls"
@@ -96,13 +95,26 @@ WSGI_APPLICATION = "core.wsgi.application"
 
 # Database
 
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.sqlite3",
+#         "NAME": BASE_DIR / "db.sqlite3",
+#     }
+# }
+
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'jobdata',       
+        'USER': 'postgres',           
+        'PASSWORD': 'admin',   
+        'HOST': 'localhost',         
+        'PORT': '5432',
+        'OPTIONS': {
+            'options': '-c search_path=auth,profile,log,job,job_request'
+        }
     }
 }
-
 
 # Password validation
 

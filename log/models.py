@@ -15,6 +15,11 @@ class ErrorLog(models.Model):
     def __str__(self):
         return f"Error at {self.timestamp}: {self.error_message[:40]}"
 
+    class Meta:
+        db_table = '"log"."error_log"'
+        verbose_name = "error_log"
+        verbose_name_plural = "error_log"
+
 
 class RestLog(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
@@ -27,3 +32,25 @@ class RestLog(models.Model):
 
     def __str__(self):
         return f"Action: {self.action} at {self.timestamp}"
+
+    class Meta:
+        db_table = '"log"."rest_log"'
+        verbose_name = "rest_log"
+        verbose_name_plural = "rest_log"
+
+
+class UserDeviceInfo(models.Model):
+    ip_address = models.GenericIPAddressField()
+    user_agent = models.TextField()
+    device_type = models.CharField(max_length=100, null=True, blank=True)
+    browser = models.CharField(max_length=100, null=True, blank=True)
+    os = models.CharField(max_length=100, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user} - {self.device} - {self.created_at}"
+
+    class Meta:
+        db_table = '"log"."user_device_info"'
+        verbose_name = "UserDeviceInfo"
+        verbose_name_plural = "UserDeviceInfo"

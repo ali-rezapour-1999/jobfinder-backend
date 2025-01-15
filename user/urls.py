@@ -1,21 +1,12 @@
 from django.urls import path
-from rest_framework_simplejwt.views import (
-    TokenRefreshView,
-    TokenVerifyView
-)
-from .views import (
-    UserRegistrationView,
-    UserLoginView,
-    GoogleLoginView,
-    SaveDeviceInfoView
-    
-)
+from rest_framework_simplejwt.views import TokenRefreshView, TokenVerifyView
+
+from .views import GoogleLoginView, UserLoginView, UserRegistrationView
 
 urlpatterns = [
-    path('register/', UserRegistrationView.as_view(), name='register'),
-    path('login/', UserLoginView.as_view(), name='login'),
-    path('google-login/', GoogleLoginView.as_view(), name='google_login'),
-    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('token/verify/', TokenVerifyView.as_view(), name='token_verify'),
-    path('api/save-device-info/', SaveDeviceInfoView.as_view(), name='save_device_info'),
+    path("register/", UserRegistrationView.as_view(), name="register"),
+    path("login/", UserLoginView.as_view(), name="login"),
+    path("google-login/", GoogleLoginView.as_view(), name="google_login"),
+    path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+    path("token/verify/", TokenVerifyView.as_view(), name="token_verify"),
 ]

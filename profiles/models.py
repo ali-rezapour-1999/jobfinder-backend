@@ -1,9 +1,9 @@
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
-from core.utils import generate_unique_id , validate_iranian_phone_number
-from user.models import BaseModel, CustomUser
+from core.utils import generate_unique_id, validate_iranian_phone_number
 from user.middleware import get_current_user
+from user.models import BaseModel, CustomUser
 
 
 class Profile(BaseModel):
@@ -43,6 +43,7 @@ class Profile(BaseModel):
         return f"{self.first_name} {self.last_name} - {self.username}"
 
     class Meta:
+        db_table = '"profile"."profile"'
         verbose_name = "Profile"
         verbose_name_plural = "Profile"
 
@@ -61,6 +62,7 @@ class WorkHistory(BaseModel):
         return f"{self.job_title} at {self.company_name}"
 
     class Meta:
+        db_table = '"profile"."work_history"'
         verbose_name = "WorkHistory"
         verbose_name_plural = "WorkHistory"
 
@@ -69,16 +71,16 @@ class Skill(BaseModel):
     name = models.CharField(max_length=100, unique=True)
 
     class Meta:
+        db_table = '"profile"."skill"'
         verbose_name = "Skill"
         verbose_name_plural = "Skill"
 
     def save(self, *args, **kwargs):
-        user = get_current_user() 
-        if not self.pk: 
+        user = get_current_user()
+        if not self.pk:
             self.create_by = user
         self.updated_by = user
         super().save(*args, **kwargs)
-
 
     def __str__(self):
         return self.name
@@ -99,13 +101,15 @@ class UserSkill(BaseModel):
         return f"{self.user} - {self.skill_reference}"
 
     class Meta:
+        db_table = '"profile"."user_skill"'
         verbose_name = "UserSkill"
         verbose_name_plural = "UserSkills"
 
 
-
 class SocialMedia(BaseModel):
-    user = models.ForeignKey(CustomUser , on_delete=models.CASCADE , related_name='socialMedia')
+    user = models.ForeignKey(
+        CustomUser, on_delete=models.CASCADE, related_name="socialMedia"
+    )
     telegram = models.URLField(null=True, blank=True)
     instagram = models.URLField(null=True, blank=True)
     twitter = models.URLField(null=True, blank=True)
@@ -115,8 +119,10 @@ class SocialMedia(BaseModel):
     website = models.URLField(null=True, blank=True)
 
     class Meta:
+        db_table = '"profile"."social_media"'
         verbose_name = "SocialMedia"
         verbose_name_plural = "SocialMedia"
 
     def __str__(self):
         return f"{self.user}"
+
