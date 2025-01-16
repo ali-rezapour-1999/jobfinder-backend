@@ -2,24 +2,31 @@ from django.conf import settings
 from django.contrib.auth import authenticate, get_user_model
 from google.auth.transport import requests
 from google.oauth2 import id_token
-from rest_framework import status
-from rest_framework.permissions import AllowAny
+from rest_framework import status , viewsets
+from rest_framework.decorators import action
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from log.models import ErrorLog, RestLog
+from user.models import CustomUser
 
-from .serializers import (GoogleLoginSerializer, UserLoginSerializer,
+from .serializers import (GoogleLoginSerializer, UserLoginSerializer, UserProfileSerializer,
                           UserRegistrationSerializer)
 
 User = get_user_model()
 
+class UserPersonalViewSet(viewsets.ModelViewSet):
+    queryset = CustomUser.objects.all()
+    serializer_class = UserProfileSerializer
+    lookup_field = "slug_id"
+    permission_classes = [IsAuthenticated]
 
-class UserRegistrationView(APIView):
+class UserAuthViewSet(viewsets.ViewSet):
     permission_classes = [AllowAny]
 
-    def post(self, request):
+    @action(detail=False, methods=['post'])
+    def register(self, request):
         serializer = UserRegistrationSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
@@ -53,11 +60,8 @@ class UserRegistrationView(APIView):
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
-class UserLoginView(APIView):
-    permission_classes = [AllowAny]
-
-    def post(self, request):
+    @action(detail=False, methods=['post'])
+    def login(self, request):
         serializer = UserLoginSerializer(data=request.data)
         if serializer.is_valid():
             email = serializer.validated_data["email"]
@@ -120,11 +124,8 @@ class UserLoginView(APIView):
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
-class GoogleLoginView(APIView):
-    permission_classes = [AllowAny]
-
-    def post(self, request):
+    @action(detail=False, methods=['post'])
+    def google_login(self, request):
         serializer = GoogleLoginSerializer(data=request.data)
         if serializer.is_valid():
             try:

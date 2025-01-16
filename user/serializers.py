@@ -1,6 +1,8 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
+from user.models import CustomUser
+
 User = get_user_model()
 
 
@@ -21,6 +23,12 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 class UserLoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True)
+
+
+class UserProfileSerializer(serializers.Serializer):
+    class Meta:
+        model =CustomUser 
+        fields = ['email', "phone_number" , 'profile_image' , 'slug' ]
 
 
 class GoogleLoginSerializer(serializers.Serializer):

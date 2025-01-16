@@ -1,8 +1,8 @@
 from django.contrib.auth.models import (AbstractBaseUser, BaseUserManager,
                                         PermissionsMixin)
-from django.db import models
 
-from core.utils import generate_unique_id
+from core.utils import generate_unique_id, validate_iranian_phone_number
+from django.db import models
 
 
 class CustomUserManager(BaseUserManager):
@@ -25,6 +25,16 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     slug_id = models.CharField(max_length=8, unique=True, default=generate_unique_id)
     email = models.EmailField(
         unique=True,
+    )
+    profile_image = models.ImageField(
+        upload_to="profile_images/", null=True, blank=True
+    )
+    phone_number = models.CharField(
+        max_length=11,
+        unique=True,
+        blank=True,
+        null=True,
+        validators=[validate_iranian_phone_number],
     )
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)

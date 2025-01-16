@@ -5,7 +5,7 @@ from .models import Profile, Review, Skill, SocialMedia, UserSkill, WorkHistory
 
 @admin.register(SocialMedia)
 class SocialMediaAdmin(admin.ModelAdmin):
-    def get_fieldsets(self, request, obj=None):
+    def get_fieldsets(self, obj=None):
         fields = [
             field.name for field in obj._meta.get_fieldsets() if not field.auto_created
         ]
@@ -18,9 +18,9 @@ class SocialMediaAdmin(admin.ModelAdmin):
 
 @admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):
-    list_display = ("user", "phone_number", "" "is_active", "created_at")
+    list_display = ("user", "is_active", "created_at")
     list_filter = ("gender", "state", "city", "is_active")
-    search_fields = ("user__email", "slug_id", "phone_number")
+    search_fields = ("user__email", "slug_id")
     readonly_fields = ("slug_id", "created_at", "updated_at")
     fieldsets = (
         (
@@ -32,10 +32,8 @@ class ProfileAdmin(admin.ModelAdmin):
                     "first_name",
                     "last_name",
                     "username",
-                    "phone_number",
                     "age",
                     "gender",
-                    "profile_image",
                 )
             },
         ),

@@ -1,7 +1,7 @@
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
-from core.utils import generate_unique_id, validate_iranian_phone_number
+from core.utils import generate_unique_id
 from user.middleware import get_current_user
 from user.models import BaseModel, CustomUser
 
@@ -13,31 +13,20 @@ class Profile(BaseModel):
         ("O", "Other"),
     ]
 
-    slug_id = models.CharField(max_length=8, unique=True, default=generate_unique_id)
+    slug_id = models.CharField(max_length=8, unique=True, default=generate_unique_id , blank=True , null=True)
     user = models.OneToOneField(
         CustomUser, on_delete=models.CASCADE, related_name="profile"
     )
-    first_name = models.CharField(max_length=100, blank=True)
-    last_name = models.CharField(max_length=100, blank=True)
+    first_name = models.CharField(max_length=100, blank=True , null=True)
+    last_name = models.CharField(max_length=100, blank=True , null=True)
     username = models.CharField(max_length=100, unique=True, null=True, blank=True)
-    phone_number = models.CharField(
-        max_length=11,
-        unique=True,
-        blank=True,
-        null=True,
-        validators=[validate_iranian_phone_number],
-    )
     age = models.PositiveIntegerField(blank=True, null=True)
-    gender = models.CharField(max_length=1, choices=gender_choices, blank=True)
-    state = models.CharField(max_length=100, blank=True)
-    city = models.CharField(max_length=100, blank=True)
+    gender = models.CharField(max_length=1, choices=gender_choices, blank=True  , null=True)
+    state = models.CharField(max_length=100, blank=True , null=True)
+    city = models.CharField(max_length=100, blank=True , null =True)
     address = models.TextField(blank=True, null=True)
 
     description_myself = models.TextField(blank=True, null=True)
-    cv_file = models.FileField(upload_to="cv_files/", blank=True, null=True)
-    profile_image = models.ImageField(
-        upload_to="profile_images/", null=True, blank=True
-    )
 
     def __str__(self):
         return f"{self.first_name} {self.last_name} - {self.username}"
