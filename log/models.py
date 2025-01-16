@@ -50,7 +50,7 @@ class UserDeviceInfo(models.Model):
     timezone= models.TextField(null=True, blank=True)
 
     def __str__(self):
-        return f"{self.user} - {self.device} - {self.created_at}"
+        return f"{self.user_agent} - {self.device_type} - {self.created_at}"
 
     class Meta:
         db_table = '"log"."user_device_info"'

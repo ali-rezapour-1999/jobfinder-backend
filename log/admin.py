@@ -4,7 +4,7 @@ from .models import ErrorLog, RestLog, UserDeviceInfo
 
 
 @admin.register(ErrorLog)
-class ErrorLogAdmin(admin.ModelAdmin):
+class ErrorsLogAdmin(admin.ModelAdmin):
     list_display = ("timestamp", "error_message")
     search_fields = ("error_message",)
 
@@ -17,5 +17,5 @@ class RestLogAdmin(admin.ModelAdmin):
 
 @admin.register(UserDeviceInfo)
 class ErrorLogAdmin(admin.ModelAdmin):
-    list_display = ("ip_address", "device_type")
+    list_display = ("os" , 'user_agent', "device_type")
     search_fields = ("ip_address","timezone" ,"user_agent" , "os")
