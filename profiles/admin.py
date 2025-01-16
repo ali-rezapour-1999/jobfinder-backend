@@ -20,25 +20,23 @@ class SocialMediaAdmin(admin.ModelAdmin):
 class ProfileAdmin(admin.ModelAdmin):
     list_display = ("user", "is_active", "created_at")
     list_filter = ("gender", "state", "city", "is_active")
-    search_fields = ("user__email", "slug_id")
-    readonly_fields = ("slug_id", "created_at", "updated_at")
+    search_fields = ("user__email", "user__phone_number")
+    readonly_fields = ( "created_at", "updated_at")
     fieldsets = (
         (
             "Personal Info",
             {
                 "fields": (
-                    "slug_id",
                     "user",
                     "first_name",
                     "last_name",
-                    "username",
                     "age",
                     "gender",
                 )
             },
         ),
         ("Address", {"fields": ("state", "city", "address")}),
-        ("Professional Info", {"fields": ("description_myself", "cv_file")}),
+        ("Professional Info", {"fields": ("description_myself", )}),
         ("Other Info", {"fields": ("is_active", "created_at", "updated_at")}),
     )
 
@@ -47,7 +45,7 @@ class ProfileAdmin(admin.ModelAdmin):
 class WorkHistoryAdmin(admin.ModelAdmin):
     list_display = ("user", "job_title", "company_name", "start_date", "end_date")
     list_filter = ("company_name", "start_date", "end_date")
-    search_fields = ("profile__slug_id", "job_title", "company_name")
+    search_fields = ( "job_title", "company_name")
     date_hierarchy = "start_date"
     fields = (
         "user",

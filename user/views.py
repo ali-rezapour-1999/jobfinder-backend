@@ -2,36 +2,37 @@ from django.conf import settings
 from django.contrib.auth import authenticate, get_user_model
 from google.auth.transport import requests
 from google.oauth2 import id_token
-from rest_framework import status , viewsets
+from rest_framework import viewsets, status, generics
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
-
 from log.models import ErrorLog, RestLog
 from user.models import CustomUser
-
-from .serializers import (GoogleLoginSerializer, UserLoginSerializer, UserProfileSerializer,
-                          UserRegistrationSerializer)
+from .serializers import (
+    UserRegistrationSerializer,
+    UserLoginSerializer,
+    GoogleLoginSerializer,
+    UserDetailSerializer,
+)
 
 User = get_user_model()
 
-class UserPersonalViewSet(viewsets.ModelViewSet):
-    queryset = CustomUser.objects.all()
-    serializer_class = UserProfileSerializer
-    lookup_field = "slug_id"
-    permission_classes = [IsAuthenticated]
 
-class UserAuthViewSet(viewsets.ViewSet):
+class UserRegistrationView(generics.CreateAPIView):
+    """
+    Handles user registration.
+    """
     permission_classes = [AllowAny]
+    serializer_class = UserRegistrationSerializer
 
-    @action(detail=False, methods=['post'])
-    def register(self, request):
-        serializer = UserRegistrationSerializer(data=request.data)
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
             refresh = RefreshToken.for_user(user)
 
+            # Log successful registration
             RestLog.objects.create(
                 user=user,
                 action="User Registration",
@@ -52,6 +53,7 @@ class UserAuthViewSet(viewsets.ViewSet):
                 status=status.HTTP_201_CREATED,
             )
 
+        # Log registration failure
         ErrorLog.objects.create(
             user=None,
             error_message="User registration failed",
@@ -60,9 +62,16 @@ class UserAuthViewSet(viewsets.ViewSet):
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    @action(detail=False, methods=['post'])
-    def login(self, request):
-        serializer = UserLoginSerializer(data=request.data)
+
+class UserLoginView(generics.GenericAPIView):
+    """
+    Handles user login.
+    """
+    permission_classes = [AllowAny]
+    serializer_class = UserLoginSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             email = serializer.validated_data["email"]
             password = serializer.validated_data["password"]
@@ -70,12 +79,12 @@ class UserAuthViewSet(viewsets.ViewSet):
             user = User.objects.filter(email=email).first()
 
             if not user:
+                # Log user not found
                 ErrorLog.objects.create(
                     user=None,
                     error_message="User not found",
                     request_data=request.data,
                 )
-
                 return Response(
                     {"error": "NOT_FOUND"},
                     status=status.HTTP_404_NOT_FOUND,
@@ -86,6 +95,7 @@ class UserAuthViewSet(viewsets.ViewSet):
             if user:
                 refresh = RefreshToken.for_user(user)
 
+                # Log successful login
                 RestLog.objects.create(
                     user=user,
                     action="User Login",
@@ -105,28 +115,35 @@ class UserAuthViewSet(viewsets.ViewSet):
                     }
                 )
 
+            # Log incorrect password
             ErrorLog.objects.create(
                 user=user,
                 error_message="Incorrect password",
                 request_data=request.data,
             )
-
             return Response(
                 {"error": "PASSWORD_INVALID"},
                 status=status.HTTP_401_UNAUTHORIZED,
             )
 
+        # Log invalid login request data
         ErrorLog.objects.create(
             user=None,
             error_message="Invalid login request data",
             request_data=serializer.errors,
         )
-
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    @action(detail=False, methods=['post'])
-    def google_login(self, request):
-        serializer = GoogleLoginSerializer(data=request.data)
+
+class GoogleLoginView(generics.GenericAPIView):
+    """
+    Handles Google login.
+    """
+    permission_classes = [AllowAny]
+    serializer_class = GoogleLoginSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             try:
                 id_info = id_token.verify_oauth2_token(
@@ -163,6 +180,7 @@ class UserAuthViewSet(viewsets.ViewSet):
                 )
 
             except ValueError as e:
+                # Log invalid Google token
                 ErrorLog.objects.create(
                     user=None,
                     error_message="Invalid Google token",
@@ -174,10 +192,28 @@ class UserAuthViewSet(viewsets.ViewSet):
                     status=status.HTTP_401_UNAUTHORIZED,
                 )
 
+        # Log invalid Google login request data
         ErrorLog.objects.create(
             user=None,
             error_message="Invalid Google login request data",
             request_data=serializer.errors,
         )
-
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserProfileViewSet(viewsets.ModelViewSet):
+    queryset = CustomUser.objects.all()
+    serializer_class = UserDetailSerializer
+    lookup_field='slug_id'
+    permission_classes = [AllowAny]
+
+    @action(detail=False, methods=['get'])
+    def me(self, request):
+        serializer = self.get_serializer(request.user)
+        RestLog.objects.create(
+            user=request.user,
+            action="Get User Data",
+            request_data={},
+            response_data=serializer.data,
+        )
+        return Response(serializer.data, status=status.HTTP_200_OK)

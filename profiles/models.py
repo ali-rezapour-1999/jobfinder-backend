@@ -1,7 +1,6 @@
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
-from core.utils import generate_unique_id
 from user.middleware import get_current_user
 from user.models import BaseModel, CustomUser
 
@@ -12,7 +11,6 @@ class Profile(BaseModel):
         ("O", "Other"),
     ]
 
-    slug_id = models.CharField(max_length=8, unique=True, default=generate_unique_id , blank=True , null=True)
     user = models.OneToOneField(
         CustomUser, on_delete=models.CASCADE, related_name="profile"
     )
@@ -27,7 +25,7 @@ class Profile(BaseModel):
     description_myself = models.TextField(blank=True, null=True)
 
     def __str__(self):
-        return f"{self.first_name} {self.last_name} - {self.username}"
+        return f"{self.first_name} {self.last_name}"
 
     class Meta:
         db_table = '"profile"."profile"'

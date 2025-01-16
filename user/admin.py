@@ -12,6 +12,7 @@ class CustomUserAdmin(BaseUserAdmin):
             None,
             {
                 "fields": (
+                    "slug_id",
                     "email",
                     "username",
                     "password",
