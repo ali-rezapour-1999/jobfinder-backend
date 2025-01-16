@@ -13,6 +13,7 @@ class CustomUserAdmin(BaseUserAdmin):
             {
                 "fields": (
                     "email",
+                    "username",
                     "password",
                 )
             },

@@ -1,9 +1,6 @@
-from django.contrib.auth.models import (AbstractBaseUser, BaseUserManager,
-                                        PermissionsMixin)
-
+from django.contrib.auth.models import (AbstractBaseUser, BaseUserManager, PermissionsMixin)
 from core.utils import generate_unique_id, validate_iranian_phone_number
 from django.db import models
-
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
@@ -36,6 +33,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         null=True,
         validators=[validate_iranian_phone_number],
     )
+    username = models.CharField(max_length=100, unique=True, null=True, blank=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)

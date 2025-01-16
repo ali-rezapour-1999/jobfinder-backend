@@ -5,7 +5,6 @@ from core.utils import generate_unique_id
 from user.middleware import get_current_user
 from user.models import BaseModel, CustomUser
 
-
 class Profile(BaseModel):
     gender_choices = [
         ("M", "Male"),
@@ -19,7 +18,6 @@ class Profile(BaseModel):
     )
     first_name = models.CharField(max_length=100, blank=True , null=True)
     last_name = models.CharField(max_length=100, blank=True , null=True)
-    username = models.CharField(max_length=100, unique=True, null=True, blank=True)
     age = models.PositiveIntegerField(blank=True, null=True)
     gender = models.CharField(max_length=1, choices=gender_choices, blank=True  , null=True)
     state = models.CharField(max_length=100, blank=True , null=True)
