@@ -9,7 +9,6 @@ class Profile(BaseModel):
     gender_choices = [
         ("M", "Male"),
         ("F", "Female"),
-        ("O", "Other"),
     ]
 
     user = models.OneToOneField(
