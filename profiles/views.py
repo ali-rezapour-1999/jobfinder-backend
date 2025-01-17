@@ -1,10 +1,13 @@
 from django.db import transaction
-from rest_framework import permissions, viewsets, status
-from rest_framework.response import Response
+from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
+from rest_framework.response import Response
+
 from log.models import ErrorLog, RestLog
+
 from .models import Profile, Review, Skill, WorkHistory
-from .serializers import ProfileSerializer, ReviewSerializer, SkillSerializer, WorkHistorySerializer
+from .serializers import (ProfileSerializer, ReviewSerializer, SkillSerializer,
+                          WorkHistorySerializer)
 
 
 class ProfileViewSet(viewsets.ModelViewSet):
@@ -71,6 +74,7 @@ class ProfileViewSet(viewsets.ModelViewSet):
 class WorkHistoryViewSet(viewsets.ModelViewSet):
     queryset = WorkHistory.objects.all()
     serializer_class = WorkHistorySerializer
+    lookup_field = "user__slug_id"
     permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):

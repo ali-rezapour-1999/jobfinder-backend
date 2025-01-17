@@ -1,7 +1,5 @@
 from django.contrib import admin
-
 from job.models import Job, JobOptions, SkillNeeded
-
 
 @admin.register(Job)
 class JobAdmin(admin.ModelAdmin):

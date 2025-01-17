@@ -4,6 +4,7 @@ from django.db import models
 from user.middleware import get_current_user
 from user.models import BaseModel, CustomUser
 
+
 class Profile(BaseModel):
     gender_choices = [
         ("M", "Male"),
@@ -14,12 +15,14 @@ class Profile(BaseModel):
     user = models.OneToOneField(
         CustomUser, on_delete=models.CASCADE, related_name="profile"
     )
-    first_name = models.CharField(max_length=100, blank=True , null=True)
-    last_name = models.CharField(max_length=100, blank=True , null=True)
+    first_name = models.CharField(max_length=100, blank=True, null=True)
+    last_name = models.CharField(max_length=100, blank=True, null=True)
     age = models.PositiveIntegerField(blank=True, null=True)
-    gender = models.CharField(max_length=1, choices=gender_choices, blank=True  , null=True)
-    state = models.CharField(max_length=100, blank=True , null=True)
-    city = models.CharField(max_length=100, blank=True , null =True)
+    gender = models.CharField(
+        max_length=1, choices=gender_choices, blank=True, null=True
+    )
+    state = models.CharField(max_length=100, blank=True, null=True)
+    city = models.CharField(max_length=100, blank=True, null=True)
     address = models.TextField(blank=True, null=True)
 
     description_myself = models.TextField(blank=True, null=True)
@@ -39,9 +42,10 @@ class WorkHistory(BaseModel):
     )
     job_title = models.CharField(max_length=200, blank=True)
     company_name = models.CharField(max_length=200, blank=True)
-    start_date = models.DateField(blank=True , null=True)
+    start_date = models.DateField(blank=True, null=True)
     end_date = models.DateField(null=True, blank=True)
     job_description = models.TextField(blank=True, null=True)
+    is_working = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.job_title} at {self.company_name}"
@@ -80,7 +84,8 @@ class UserSkill(BaseModel):
         max_digits=5,
         decimal_places=1,
         validators=[MinValueValidator(0), MaxValueValidator(100)],
-        null=True, blank=True
+        null=True,
+        blank=True,
     )
 
     def __str__(self):
@@ -118,7 +123,9 @@ class Review(models.Model):
         CustomUser, on_delete=models.CASCADE, related_name="reviews"
     )
     likes = models.ManyToManyField(CustomUser, related_name="liked_reviews", blank=True)
-    dislikes = models.ManyToManyField(CustomUser, related_name="disliked_reviews", blank=True)
+    dislikes = models.ManyToManyField(
+        CustomUser, related_name="disliked_reviews", blank=True
+    )
 
     class Meta:
         db_table = '"profile"."review"'
