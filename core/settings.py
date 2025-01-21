@@ -29,7 +29,6 @@ INSTALLED_APPS = [
     "job",
     "jobRequest",
     "log",
-    "review",
 ]
 
 
