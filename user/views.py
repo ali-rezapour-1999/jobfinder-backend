@@ -2,19 +2,17 @@ from django.conf import settings
 from django.contrib.auth import authenticate, get_user_model
 from google.auth.transport import requests
 from google.oauth2 import id_token
-from rest_framework import viewsets, status, generics
+from rest_framework import generics, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
+
 from log.models import ErrorLog, RestLog
 from user.models import CustomUser
-from .serializers import (
-    UserRegistrationSerializer,
-    UserLoginSerializer,
-    GoogleLoginSerializer,
-    UserDetailSerializer,
-)
+
+from .serializers import (GoogleLoginSerializer, UserDetailSerializer,
+                          UserLoginSerializer, UserRegistrationSerializer)
 
 User = get_user_model()
 
@@ -23,6 +21,7 @@ class UserRegistrationView(generics.CreateAPIView):
     """
     Handles user registration.
     """
+
     permission_classes = [AllowAny]
     serializer_class = UserRegistrationSerializer
 
@@ -67,6 +66,7 @@ class UserLoginView(generics.GenericAPIView):
     """
     Handles user login.
     """
+
     permission_classes = [AllowAny]
     serializer_class = UserLoginSerializer
 
@@ -139,6 +139,7 @@ class GoogleLoginView(generics.GenericAPIView):
     """
     Handles Google login.
     """
+
     permission_classes = [AllowAny]
     serializer_class = GoogleLoginSerializer
 
@@ -204,10 +205,10 @@ class GoogleLoginView(generics.GenericAPIView):
 class UserProfileViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.all()
     serializer_class = UserDetailSerializer
-    lookup_field='slug_id'
+    lookup_field = "slug_id"
     permission_classes = [AllowAny]
 
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=["get"])
     def me(self, request):
         serializer = self.get_serializer(request.user)
         RestLog.objects.create(

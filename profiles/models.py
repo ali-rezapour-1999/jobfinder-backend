@@ -115,18 +115,3 @@ class SocialMedia(BaseModel):
 
     def __str__(self):
         return f"{self.user}"
-
-
-class Review(models.Model):
-    user = models.ForeignKey(
-        CustomUser, on_delete=models.CASCADE, related_name="reviews"
-    )
-    likes = models.ManyToManyField(CustomUser, related_name="liked_reviews", blank=True)
-    dislikes = models.ManyToManyField(
-        CustomUser, related_name="disliked_reviews", blank=True
-    )
-
-    class Meta:
-        db_table = '"profile"."review"'
-        verbose_name = "Review"
-        verbose_name_plural = "Review"

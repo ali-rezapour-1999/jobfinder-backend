@@ -10,6 +10,7 @@ urlpatterns = [
     path("auth/", include("user.urls")),
     path("profile/", include("profiles.urls")),
     path("log/device-info/", DeviceInfoView.as_view(), name="device-info"),
+    path("review/", include("review.urls")),
 ]
 
 if settings.DEBUG:

@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Profile, Review, Skill, SocialMedia, UserSkill, WorkHistory
+from .models import Profile, Skill, SocialMedia, UserSkill, WorkHistory
 
 
 @admin.register(SocialMedia)
@@ -21,7 +21,7 @@ class ProfileAdmin(admin.ModelAdmin):
     list_display = ("user", "is_active", "created_at")
     list_filter = ("gender", "state", "city", "is_active")
     search_fields = ("user__email", "user__phone_number")
-    readonly_fields = ( "created_at", "updated_at")
+    readonly_fields = ("created_at", "updated_at")
     fieldsets = (
         (
             "Personal Info",
@@ -36,7 +36,7 @@ class ProfileAdmin(admin.ModelAdmin):
             },
         ),
         ("Address", {"fields": ("state", "city", "address")}),
-        ("Professional Info", {"fields": ("description_myself", )}),
+        ("Professional Info", {"fields": ("description_myself",)}),
         ("Other Info", {"fields": ("is_active", "created_at", "updated_at")}),
     )
 
@@ -45,7 +45,7 @@ class ProfileAdmin(admin.ModelAdmin):
 class WorkHistoryAdmin(admin.ModelAdmin):
     list_display = ("user", "job_title", "company_name", "start_date", "end_date")
     list_filter = ("company_name", "start_date", "end_date")
-    search_fields = ( "job_title", "company_name")
+    search_fields = ("job_title", "company_name")
     date_hierarchy = "start_date"
     fields = (
         "user",
@@ -73,14 +73,4 @@ class UserSkillAdmin(admin.ModelAdmin):
     search_fields = (
         "user",
         "skill",
-    )
-
-
-@admin.register(Review)
-class ReviewAdmin(admin.ModelAdmin):
-    list_display = (
-        "user",
-    )
-    search_fields = (
-        "user",
     )

@@ -12,7 +12,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'jazzmin',
+    "jazzmin",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     "job",
     "jobRequest",
     "log",
+    "review",
 ]
 
 
@@ -104,16 +105,14 @@ WSGI_APPLICATION = "core.wsgi.application"
 # }
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'jobdata',       
-        'USER': 'postgres',           
-        'PASSWORD': 'admin',   
-        'HOST': 'localhost',         
-        'PORT': '5432',
-        'OPTIONS': {
-            'options': '-c search_path=auth,profile,log,job,job_request'
-        }
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "jobdata",
+        "USER": "postgres",
+        "PASSWORD": "admin",
+        "HOST": "localhost",
+        "PORT": "5432",
+        "OPTIONS": {"options": "-c search_path=auth,profile,log,job,job_request"},
     }
 }
 
