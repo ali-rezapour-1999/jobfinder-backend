@@ -1,5 +1,8 @@
 from django.contrib.auth.models import (
-    AbstractBaseUser, BaseUserManager, PermissionsMixin)
+    AbstractBaseUser,
+    BaseUserManager,
+    PermissionsMixin,
+)
 from django.db import models
 from core.utils import generate_unique_id, validate_iranian_phone_number
 
@@ -7,7 +10,7 @@ from core.utils import generate_unique_id, validate_iranian_phone_number
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
         if not email:
-            raise ValueError("The Email field must be set")
+            raise ValueError("فیلد ایمیل باید پر شود")
         email = self.normalize_email(email)
         user = self.model(email=email, **extra_fields)
         user.set_password(password)
@@ -21,8 +24,7 @@ class CustomUserManager(BaseUserManager):
 
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
-    slug_id = models.CharField(
-        max_length=8, unique=True, default=generate_unique_id)
+    slug_id = models.CharField(max_length=8, unique=True, default=generate_unique_id)
     email = models.EmailField(
         unique=True,
     )
@@ -36,11 +38,11 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         null=True,
         validators=[validate_iranian_phone_number],
     )
-    username = models.CharField(
-        max_length=100, unique=True, null=True, blank=True)
+    first_last_name = models.CharField(max_length=100, null=False, blank=False)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now_add=True)
 
     objects = CustomUserManager()
 

@@ -28,10 +28,9 @@ class ProfileAdmin(admin.ModelAdmin):
             {
                 "fields": (
                     "user",
-                    "first_name",
-                    "last_name",
                     "age",
                     "gender",
+                    "my_skill",
                 )
             },
         ),
@@ -43,7 +42,8 @@ class ProfileAdmin(admin.ModelAdmin):
 
 @admin.register(WorkHistory)
 class WorkHistoryAdmin(admin.ModelAdmin):
-    list_display = ("user", "job_title", "company_name", "start_date", "end_date")
+    list_display = ("user", "job_title", "company_name",
+                    "start_date", "end_date")
     list_filter = ("company_name", "start_date", "end_date")
     search_fields = ("job_title", "company_name")
     date_hierarchy = "start_date"

@@ -11,17 +11,17 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from log.models import ErrorLog, RestLog
 from user.models import CustomUser
 
-from .serializers import (GoogleLoginSerializer, UserDetailSerializer,
-                          UserLoginSerializer, UserRegistrationSerializer)
+from .serializers import (
+    GoogleLoginSerializer,
+    UserDetailSerializer,
+    UserLoginSerializer,
+    UserRegistrationSerializer,
+)
 
 User = get_user_model()
 
 
 class UserRegistrationView(generics.CreateAPIView):
-    """
-    Handles user registration.
-    """
-
     permission_classes = [AllowAny]
     serializer_class = UserRegistrationSerializer
 
@@ -30,8 +30,6 @@ class UserRegistrationView(generics.CreateAPIView):
         if serializer.is_valid():
             user = serializer.save()
             refresh = RefreshToken.for_user(user)
-
-            # Log successful registration
             RestLog.objects.create(
                 user=user,
                 action="User Registration",
@@ -39,20 +37,17 @@ class UserRegistrationView(generics.CreateAPIView):
                 response_data={
                     "refresh": str(refresh),
                     "access": str(refresh.access_token),
-                    "user": {"email": user.email},
+                    "user": {"email": user.email, "slug": user.slug_id},
                 },
             )
-
             return Response(
                 {
                     "refresh": str(refresh),
                     "access": str(refresh.access_token),
-                    "user": {"email": user.email},
+                    "user": {"email": user.email, "slug": user.slug_id},
                 },
                 status=status.HTTP_201_CREATED,
             )
-
-        # Log registration failure
         ErrorLog.objects.create(
             user=None,
             error_message="User registration failed",
@@ -63,10 +58,6 @@ class UserRegistrationView(generics.CreateAPIView):
 
 
 class UserLoginView(generics.GenericAPIView):
-    """
-    Handles user login.
-    """
-
     permission_classes = [AllowAny]
     serializer_class = UserLoginSerializer
 
@@ -79,7 +70,6 @@ class UserLoginView(generics.GenericAPIView):
             user = User.objects.filter(email=email).first()
 
             if not user:
-                # Log user not found
                 ErrorLog.objects.create(
                     user=None,
                     error_message="User not found",
@@ -89,13 +79,9 @@ class UserLoginView(generics.GenericAPIView):
                     {"error": "NOT_FOUND"},
                     status=status.HTTP_404_NOT_FOUND,
                 )
-
             user = authenticate(request, email=email, password=password)
-
             if user:
                 refresh = RefreshToken.for_user(user)
-
-                # Log successful login
                 RestLog.objects.create(
                     user=user,
                     action="User Login",
@@ -106,7 +92,6 @@ class UserLoginView(generics.GenericAPIView):
                         "user": {"email": user.email, "slug": user.slug_id},
                     },
                 )
-
                 return Response(
                     {
                         "refresh": str(refresh),
@@ -114,8 +99,6 @@ class UserLoginView(generics.GenericAPIView):
                         "user": {"email": user.email, "slug": user.slug_id},
                     }
                 )
-
-            # Log incorrect password
             ErrorLog.objects.create(
                 user=user,
                 error_message="Incorrect password",
@@ -125,8 +108,6 @@ class UserLoginView(generics.GenericAPIView):
                 {"error": "PASSWORD_INVALID"},
                 status=status.HTTP_401_UNAUTHORIZED,
             )
-
-        # Log invalid login request data
         ErrorLog.objects.create(
             user=None,
             error_message="Invalid login request data",
@@ -136,10 +117,6 @@ class UserLoginView(generics.GenericAPIView):
 
 
 class GoogleLoginView(generics.GenericAPIView):
-    """
-    Handles Google login.
-    """
-
     permission_classes = [AllowAny]
     serializer_class = GoogleLoginSerializer
 
@@ -152,15 +129,11 @@ class GoogleLoginView(generics.GenericAPIView):
                     requests.Request(),
                     settings.GOOGLE_CLIENT_ID,
                 )
-
                 user, created = User.objects.get_or_create(
                     google_id=id_info["sub"],
                     defaults={"email": id_info["email"], "is_active": True},
                 )
-
                 refresh = RefreshToken.for_user(user)
-
-                # Log successful Google login
                 RestLog.objects.create(
                     user=user,
                     action="Google Login",
@@ -171,7 +144,6 @@ class GoogleLoginView(generics.GenericAPIView):
                         "user": {"email": user.email, "is_new": created},
                     },
                 )
-
                 return Response(
                     {
                         "refresh": str(refresh),
@@ -179,9 +151,7 @@ class GoogleLoginView(generics.GenericAPIView):
                         "user": {"email": user.email, "is_new": created},
                     }
                 )
-
             except ValueError as e:
-                # Log invalid Google token
                 ErrorLog.objects.create(
                     user=None,
                     error_message="Invalid Google token",
@@ -192,8 +162,6 @@ class GoogleLoginView(generics.GenericAPIView):
                     {"error": "Invalid Google token"},
                     status=status.HTTP_401_UNAUTHORIZED,
                 )
-
-        # Log invalid Google login request data
         ErrorLog.objects.create(
             user=None,
             error_message="Invalid Google login request data",

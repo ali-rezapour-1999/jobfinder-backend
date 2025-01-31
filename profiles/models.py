@@ -5,6 +5,25 @@ from user.middleware import get_current_user
 from user.models import BaseModel, CustomUser
 
 
+class Skill(BaseModel):
+    name = models.CharField(max_length=100, unique=True)
+
+    class Meta:
+        db_table = '"profile"."skill"'
+        verbose_name = "Skill"
+        verbose_name_plural = "Skill"
+
+    def save(self, *args, **kwargs):
+        user = get_current_user()
+        if not self.pk:
+            self.create_by = user
+        self.updated_by = user
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.name
+
+
 class Profile(BaseModel):
     gender_choices = [
         ("M", "Male"),
@@ -14,8 +33,6 @@ class Profile(BaseModel):
     user = models.OneToOneField(
         CustomUser, on_delete=models.CASCADE, related_name="profile"
     )
-    first_name = models.CharField(max_length=100, blank=True, null=True)
-    last_name = models.CharField(max_length=100, blank=True, null=True)
     age = models.PositiveIntegerField(blank=True, null=True)
     gender = models.CharField(
         max_length=1, choices=gender_choices, blank=True, null=True
@@ -23,11 +40,11 @@ class Profile(BaseModel):
     state = models.CharField(max_length=100, blank=True, null=True)
     city = models.CharField(max_length=100, blank=True, null=True)
     address = models.TextField(blank=True, null=True)
-
     description_myself = models.TextField(blank=True, null=True)
+    my_skill = models.ManyToManyField(Skill, related_name="my_skill")
 
     def __str__(self):
-        return f"{self.first_name} {self.last_name}"
+        return f"{self.user.first_last_name}"
 
     class Meta:
         db_table = '"profile"."profile"'
@@ -55,30 +72,15 @@ class WorkHistory(BaseModel):
         verbose_name_plural = "WorkHistory"
 
 
-class Skill(BaseModel):
-    name = models.CharField(max_length=100, unique=True)
-
-    class Meta:
-        db_table = '"profile"."skill"'
-        verbose_name = "Skill"
-        verbose_name_plural = "Skill"
-
-    def save(self, *args, **kwargs):
-        user = get_current_user()
-        if not self.pk:
-            self.create_by = user
-        self.updated_by = user
-        super().save(*args, **kwargs)
-
-    def __str__(self):
-        return self.name
-
-
 class UserSkill(BaseModel):
     user = models.ForeignKey(
         CustomUser, on_delete=models.CASCADE, related_name="user_skills"
     )
-    skill_reference = models.ManyToManyField(Skill, related_name="related_skill")
+    skill_reference = models.ForeignKey(
+        Skill, on_delete=models.CASCADE, related_name="related_skill"
+    )
+    year = models.PositiveIntegerField()
+    moon = models.PositiveIntegerField()
     level = models.DecimalField(
         max_digits=5,
         decimal_places=1,

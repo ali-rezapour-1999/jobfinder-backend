@@ -23,9 +23,7 @@ class WorkHistorySerializer(serializers.ModelSerializer):
 
 
 class ProfileSerializer(serializers.ModelSerializer):
-    skills = SkillSerializer(many=True, read_only=True)
-    work_history_entries = WorkHistorySerializer(many=True, read_only=True)
-    email = serializers.SerializerMethodField()
+    my_skill = SkillSerializer(many=True, read_only=True)
 
     class Meta:
         model = Profile
