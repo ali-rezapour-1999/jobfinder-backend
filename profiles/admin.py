@@ -5,15 +5,23 @@ from .models import Profile, Skill, SocialMedia, UserSkill, WorkHistory
 
 @admin.register(SocialMedia)
 class SocialMediaAdmin(admin.ModelAdmin):
-    def get_fieldsets(self, obj=None):
-        fields = [
-            field.name for field in obj._meta.get_fieldsets() if not field.auto_created
-        ]
-        fields = [f for f in fields if f not in ("created_at", "updated_at")]
-        return [
-            ("Main Information", {"fields": fields}),
-            ("Timestamps", {"fields": ("created_at", "updated_at")}),
-        ]
+    list_display = ("user", "is_active", "created_at")
+    list_filter = ("title", "user", "is_active")
+    search_fields = ("user__email", "user__phone_number", "title", "address")
+    readonly_fields = ("created_at", "updated_at")
+    fieldsets = (
+        (
+            "Personal Info",
+            {
+                "fields": (
+                    "user",
+                    "title",
+                    "address",
+                )
+            },
+        ),
+        ("Other Info", {"fields": ("is_active", "created_at", "updated_at")}),
+    )
 
 
 @admin.register(Profile)

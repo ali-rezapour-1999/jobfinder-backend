@@ -1,0 +1,20 @@
+version: "3"
+services:
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: jobdata
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+    ports:
+      - "5434:5433"
+
+  web:
+    build: .
+    command: ./wait-for-it.sh db:5432 -- python manage.py runserver 0.0.0.0:8000
+    depends_on:
+      - db
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgres://postgres:admin@db:5432/jobdata
