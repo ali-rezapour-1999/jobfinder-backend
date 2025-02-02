@@ -10,48 +10,53 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('log', '0001_initial'),
+        ('job', '0001_initial'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='errorlog',
+            model_name='job',
             name='create_by',
             field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(class)s_create_by', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
-            model_name='errorlog',
+            model_name='job',
             name='updated_by',
             field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(class)s_updated_by', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
-            model_name='errorlog',
+            model_name='job',
             name='user',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='user', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
-            model_name='restlog',
+            model_name='joboptions',
             name='create_by',
             field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(class)s_create_by', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
-            model_name='restlog',
+            model_name='joboptions',
+            name='job',
+            field=models.ManyToManyField(related_name='job_options', to='job.job'),
+        ),
+        migrations.AddField(
+            model_name='joboptions',
             name='updated_by',
             field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(class)s_updated_by', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
-            model_name='restlog',
-            name='user',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to=settings.AUTH_USER_MODEL),
-        ),
-        migrations.AddField(
-            model_name='userdeviceinfo',
+            model_name='skillneeded',
             name='create_by',
             field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(class)s_create_by', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
-            model_name='userdeviceinfo',
+            model_name='skillneeded',
+            name='job',
+            field=models.ManyToManyField(related_name='job_skillneeded', to='job.job'),
+        ),
+        migrations.AddField(
+            model_name='skillneeded',
             name='updated_by',
             field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(class)s_updated_by', to=settings.AUTH_USER_MODEL),
         ),

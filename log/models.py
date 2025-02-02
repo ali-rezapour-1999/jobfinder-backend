@@ -1,9 +1,9 @@
 from django.db import models
 
-from user.models import CustomUser
+from user.models import CustomUser, BaseModel
 
 
-class ErrorLog(models.Model):
+class ErrorLog(BaseModel):
     timestamp = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(
         CustomUser, on_delete=models.SET_NULL, null=True, blank=True
@@ -21,7 +21,7 @@ class ErrorLog(models.Model):
         verbose_name_plural = "error_log"
 
 
-class RestLog(models.Model):
+class RestLog(BaseModel):
     timestamp = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(
         CustomUser, on_delete=models.SET_NULL, null=True, blank=True
@@ -39,15 +39,14 @@ class RestLog(models.Model):
         verbose_name_plural = "rest_log"
 
 
-class UserDeviceInfo(models.Model):
-    ip_address = models.TextField(null=True , blank=True)
+class UserDeviceInfo(BaseModel):
+    ip_address = models.TextField(null=True, blank=True)
     user_agent = models.TextField()
     device_type = models.CharField(max_length=100, null=True, blank=True)
     browser = models.CharField(max_length=100, null=True, blank=True)
     os = models.CharField(max_length=100, null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    screen_resolution =models.TextField(null=True, blank=True)
-    timezone= models.TextField(null=True, blank=True)
+    screen_resolution = models.TextField(null=True, blank=True)
+    timezone = models.TextField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.user_agent} - {self.device_type} - {self.created_at}"

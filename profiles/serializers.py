@@ -1,12 +1,18 @@
 from rest_framework import serializers
 
-from .models import Profile, Skill, WorkHistory
+from .models import Profile, Skill, WorkHistory, SocialMedia
 
 
 class SkillSerializer(serializers.ModelSerializer):
     class Meta:
         model = Skill
         fields = ["id", "name"]
+
+
+class SocialMediaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SocialMedia
+        fields = ["id", "title", "address"]
 
 
 class WorkHistorySerializer(serializers.ModelSerializer):

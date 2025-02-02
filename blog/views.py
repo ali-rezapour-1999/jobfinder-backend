@@ -1,33 +1,28 @@
 from rest_framework import permissions, viewsets
 from log.models import ErrorLog, RestLog
-from .models import Profile, Skill, WorkHistory, SocialMedia
-from .serializers import (
-    ProfileSerializer,
-    SkillSerializer,
-    WorkHistorySerializer,
-    SocialMediaSerializer,
-)
+from .models import Tag, Category, Post
+from .serializers import PostSerializers, TagSerializer, CategorySerializer
 
 
-class ProfileViewSet(viewsets.ModelViewSet):
-    queryset = Profile.objects.select_related("user").filter(is_active=True)
-    serializer_class = ProfileSerializer
-    lookup_field = "user__slug_id"
+class PostViewSet(viewsets.ModelViewSet):
+    queryset = Post.objects.filter(is_active=True)
+    serializer_class = PostSerializers
+    lookup_field = "slug_id"
     permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
         try:
-            profile = serializer.save()
+            post = serializer.save()
             RestLog.objects.create(
                 user=self.request.user if self.request.user.is_authenticated else None,
-                action="Profile Created",
+                action="post Created",
                 request_data=self.request.data,
-                response_data=ProfileSerializer(profile).data,
+                response_data=PostSerializers(post).data,
             )
         except Exception as e:
             ErrorLog.objects.create(
                 user=self.request.user if self.request.user.is_authenticated else None,
-                error_message="Profile creation failed",
+                error_message="post creation failed",
                 stack_trace=str(e),
                 request_data=self.request.data,
             )
@@ -35,17 +30,17 @@ class ProfileViewSet(viewsets.ModelViewSet):
 
     def perform_update(self, serializer):
         try:
-            profile = serializer.save()
+            post = serializer.save()
             RestLog.objects.create(
                 user=self.request.user if self.request.user.is_authenticated else None,
-                action="Profile Updated",
+                action="Post Updated",
                 request_data=self.request.data,
-                response_data=ProfileSerializer(profile).data,
+                response_data=PostSerializers(post).data,
             )
         except Exception as e:
             ErrorLog.objects.create(
                 user=self.request.user if self.request.user.is_authenticated else None,
-                error_message="Profile update failed",
+                error_message="Post update failed",
                 stack_trace=str(e),
                 request_data=self.request.data,
             )
@@ -56,40 +51,39 @@ class ProfileViewSet(viewsets.ModelViewSet):
             instance.delete()
             RestLog.objects.create(
                 user=self.request.user if self.request.user.is_authenticated else None,
-                action="Profile Deleted",
+                action="Post Deleted",
                 request_data=self.request.data,
                 response_data={"slug_id": instance.slug_id},
             )
         except Exception as e:
             ErrorLog.objects.create(
                 user=self.request.user if self.request.user.is_authenticated else None,
-                error_message="Profile deletion failed",
+                error_message="Post failed",
                 stack_trace=str(e),
                 request_data=self.request.data,
             )
             raise e
 
 
-class WorkHistoryViewSet(viewsets.ModelViewSet):
-    queryset = WorkHistory.objects.select_related(
-        "user").filter(is_active=True)
-    serializer_class = WorkHistorySerializer
-    lookup_field = "user__slug_id"
+class TagViewSet(viewsets.ModelViewSet):
+    queryset = Tag.objects.filter(is_active=True)
+    serializer_class = Tag
+    lookup_field = "slug_id"
     permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
         try:
-            work_history = serializer.save()
+            tag = serializer.save()
             RestLog.objects.create(
                 user=self.request.user if self.request.user.is_authenticated else None,
-                action="Work History Created",
+                action="Tag Created",
                 request_data=self.request.data,
-                response_data=WorkHistorySerializer(work_history).data,
+                response_data=PostSerializers(tag).data,
             )
         except Exception as e:
             ErrorLog.objects.create(
                 user=self.request.user if self.request.user.is_authenticated else None,
-                error_message="Work history creation failed",
+                error_message="Tag creation failed",
                 stack_trace=str(e),
                 request_data=self.request.data,
             )
@@ -97,17 +91,17 @@ class WorkHistoryViewSet(viewsets.ModelViewSet):
 
     def perform_update(self, serializer):
         try:
-            work_history = serializer.save()
+            tag = serializer.save()
             RestLog.objects.create(
                 user=self.request.user if self.request.user.is_authenticated else None,
-                action="Work History Updated",
+                action="Tag Updated",
                 request_data=self.request.data,
-                response_data=WorkHistorySerializer(work_history).data,
+                response_data=TagSerializer(tag).data,
             )
         except Exception as e:
             ErrorLog.objects.create(
                 user=self.request.user if self.request.user.is_authenticated else None,
-                error_message="Work history update failed",
+                error_message="Tag update failed",
                 stack_trace=str(e),
                 request_data=self.request.data,
             )
@@ -118,39 +112,39 @@ class WorkHistoryViewSet(viewsets.ModelViewSet):
             instance.delete()
             RestLog.objects.create(
                 user=self.request.user if self.request.user.is_authenticated else None,
-                action="Work History Deleted",
+                action="Tag Deleted",
                 request_data=self.request.data,
-                response_data={"id": instance.id},
+                response_data={"slug_id": instance.slug_id},
             )
         except Exception as e:
             ErrorLog.objects.create(
                 user=self.request.user if self.request.user.is_authenticated else None,
-                error_message="Work history deletion failed",
+                error_message="Tag failed",
                 stack_trace=str(e),
                 request_data=self.request.data,
             )
             raise e
 
 
-class SkillViewSet(viewsets.ModelViewSet):
-    queryset = Skill.objects.select_related("user").filter(is_active=True)
-    serializer_class = SkillSerializer
-    lookup_field = "user__slug_id"
+class CatagoryViewSet(viewsets.ModelViewSet):
+    queryset = Category.objects.filter(is_active=True)
+    serializer_class = CategorySerializer
+    lookup_field = "slug_id"
     permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
         try:
-            skill = serializer.save()
+            category = serializer.save()
             RestLog.objects.create(
                 user=self.request.user if self.request.user.is_authenticated else None,
-                action="Skill Created",
+                action="Tag Created",
                 request_data=self.request.data,
-                response_data=SkillSerializer(skill).data,
+                response_data=CategorySerializer(category).data,
             )
         except Exception as e:
             ErrorLog.objects.create(
                 user=self.request.user if self.request.user.is_authenticated else None,
-                error_message="Skill creation failed",
+                error_message="Category creation failed",
                 stack_trace=str(e),
                 request_data=self.request.data,
             )
@@ -158,17 +152,17 @@ class SkillViewSet(viewsets.ModelViewSet):
 
     def perform_update(self, serializer):
         try:
-            skill = serializer.save()
+            category = serializer.save()
             RestLog.objects.create(
                 user=self.request.user if self.request.user.is_authenticated else None,
-                action="Skill Updated",
+                action="Catagory Updated",
                 request_data=self.request.data,
-                response_data=SkillSerializer(skill).data,
+                response_data=CategorySerializer(category).data,
             )
         except Exception as e:
             ErrorLog.objects.create(
                 user=self.request.user if self.request.user.is_authenticated else None,
-                error_message="Skill update failed",
+                error_message="Category update failed",
                 stack_trace=str(e),
                 request_data=self.request.data,
             )
@@ -179,76 +173,14 @@ class SkillViewSet(viewsets.ModelViewSet):
             instance.delete()
             RestLog.objects.create(
                 user=self.request.user if self.request.user.is_authenticated else None,
-                action="Skill Deleted",
+                action="Category Deleted",
                 request_data=self.request.data,
-                response_data={"id": instance.id},
+                response_data={"slug_id": instance.slug_id},
             )
         except Exception as e:
             ErrorLog.objects.create(
                 user=self.request.user if self.request.user.is_authenticated else None,
-                error_message="Skill deletion failed",
-                stack_trace=str(e),
-                request_data=self.request.data,
-            )
-            raise e
-
-
-class SocialMedaiViewSet(viewsets.ModelViewSet):
-    queryset = SocialMedia.objects.select_related(
-        "user").filter(is_active=True)
-    serializer_class = SocialMediaSerializer
-    lookup_field = "user__slug_id"
-    permission_classes = [permissions.IsAuthenticated]
-
-    def perform_create(self, serializer):
-        try:
-            socialMedia = serializer.save()
-            RestLog.objects.create(
-                user=self.request.user if self.request.user.is_authenticated else None,
-                action="SocialMedia Created",
-                request_data=self.request.data,
-                response_data=SocialMediaSerializer(socialMedia).data,
-            )
-        except Exception as e:
-            ErrorLog.objects.create(
-                user=self.request.user if self.request.user.is_authenticated else None,
-                error_message="SocialMedia creation failed",
-                stack_trace=str(e),
-                request_data=self.request.data,
-            )
-            raise e
-
-    def perform_update(self, serializer):
-        try:
-            socialMedia = serializer.save()
-            RestLog.objects.create(
-                user=self.request.user if self.request.user.is_authenticated else None,
-                action="SocialMedia Updated",
-                request_data=self.request.data,
-                response_data=SocialMediaSerializer(socialMedia).data,
-            )
-        except Exception as e:
-            ErrorLog.objects.create(
-                user=self.request.user if self.request.user.is_authenticated else None,
-                error_message="SocialMedia update failed",
-                stack_trace=str(e),
-                request_data=self.request.data,
-            )
-            raise e
-
-    def perform_destroy(self, instance):
-        try:
-            instance.delete()
-            RestLog.objects.create(
-                user=self.request.user if self.request.user.is_authenticated else None,
-                action="SocialMedia Deleted",
-                request_data=self.request.data,
-                response_data={"id": instance.id},
-            )
-        except Exception as e:
-            ErrorLog.objects.create(
-                user=self.request.user if self.request.user.is_authenticated else None,
-                error_message="SocialMedia deletion failed",
+                error_message="Category failed",
                 stack_trace=str(e),
                 request_data=self.request.data,
             )

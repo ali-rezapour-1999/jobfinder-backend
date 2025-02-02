@@ -6,7 +6,8 @@ class Command(BaseCommand):
     help = "Create schemas if they do not exist"
 
     def handle(self, *args, **kwargs):
-        schemas = ["public", "auth", "profile", "log", "job", "job_request"]
+        schemas = ["public", "auth", "profile",
+                   "log", "job", "job_request", "blog"]
         with connection.cursor() as cursor:
             for schema in schemas:
                 cursor.execute(

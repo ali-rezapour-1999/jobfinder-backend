@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     "job",
     "jobRequest",
     "log",
+    "blog",
 ]
 
 
@@ -111,7 +112,7 @@ DATABASES = {
         "PASSWORD": "admin",
         "HOST": "localhost",
         "PORT": "5432",
-        "OPTIONS": {"options": "-c search_path=auth,profile,log,job,job_request"},
+        "OPTIONS": {"options": "-c search_path=auth,profile,log,job,job_request,blog"},
     }
 }
 

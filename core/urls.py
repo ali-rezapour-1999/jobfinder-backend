@@ -7,9 +7,10 @@ from log.views import DeviceInfoView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("auth/", include("user.urls")),
-    path("profile/", include("profiles.urls")),
-    path("log/device-info/", DeviceInfoView.as_view(), name="device-info"),
+    path("api/auth/", include("user.urls")),
+    path("api/profile/", include("profiles.urls")),
+    path("api/blog/", include("blog.urls")),
+    path("api/log/device-info/", DeviceInfoView.as_view(), name="device-info"),
 ]
 
 if settings.DEBUG:

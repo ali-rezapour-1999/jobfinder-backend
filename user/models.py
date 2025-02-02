@@ -24,7 +24,9 @@ class CustomUserManager(BaseUserManager):
 
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
-    slug_id = models.CharField(max_length=8, unique=True, default=generate_unique_id)
+    slug_id = models.SlugField(
+        max_length=8, unique=True, blank=True, default=generate_unique_id()
+    )
     email = models.EmailField(
         unique=True,
     )
@@ -59,6 +61,13 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
 
 class BaseModel(models.Model):
+    slug_id = models.SlugField(
+        max_length=8,
+        unique=True,
+        blank=True,
+        default=generate_unique_id,
+        editable=False,
+    )
     create_by = models.ForeignKey(
         CustomUser,
         on_delete=models.SET_NULL,
@@ -77,5 +86,5 @@ class BaseModel(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=True)
 
-    class Mete:
+    class Meta:
         abstract = True

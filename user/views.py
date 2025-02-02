@@ -171,10 +171,10 @@ class GoogleLoginView(generics.GenericAPIView):
 
 
 class UserProfileViewSet(viewsets.ModelViewSet):
-    queryset = CustomUser.objects.all()
+    queryset = CustomUser.objects.filter(is_active=True)
     serializer_class = UserDetailSerializer
     lookup_field = "slug_id"
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     @action(detail=False, methods=["get"])
     def me(self, request):
