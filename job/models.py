@@ -1,7 +1,8 @@
 from django.contrib.auth.models import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 
-from user.models import BaseModel, CustomUser
+from user.models import CustomUser
+from base.models import BaseModel
 
 
 class Job(BaseModel):

@@ -1,18 +1,20 @@
 from rest_framework import serializers
-
-from .models import Profile, Skill, WorkHistory, SocialMedia
-
-
-class SkillSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Skill
-        fields = ["id", "name"]
+from .models import Profile, WorkHistory, SocialMedia, UserSkill
+from base.serializers import TagsSerializer
 
 
 class SocialMediaSerializer(serializers.ModelSerializer):
     class Meta:
         model = SocialMedia
         fields = ["id", "title", "address"]
+
+
+class UserSkillSerializer(serializers.ModelSerializer):
+    skill_reference = TagsSerializer(read_only=True)
+
+    class Meta:
+        model = UserSkill
+        fields = "__all__"
 
 
 class WorkHistorySerializer(serializers.ModelSerializer):
@@ -29,8 +31,6 @@ class WorkHistorySerializer(serializers.ModelSerializer):
 
 
 class ProfileSerializer(serializers.ModelSerializer):
-    my_skill = SkillSerializer(many=True, read_only=True)
-
     class Meta:
         model = Profile
         fields = "__all__"

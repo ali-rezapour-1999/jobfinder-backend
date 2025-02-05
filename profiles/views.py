@@ -1,11 +1,11 @@
 from rest_framework import permissions, viewsets
 from log.models import ErrorLog, RestLog
-from .models import Profile, Skill, WorkHistory, SocialMedia
+from .models import Profile, WorkHistory, SocialMedia, UserSkill
 from .serializers import (
     ProfileSerializer,
-    SkillSerializer,
     WorkHistorySerializer,
     SocialMediaSerializer,
+    UserSkillSerializer,
 )
 
 
@@ -132,67 +132,6 @@ class WorkHistoryViewSet(viewsets.ModelViewSet):
             raise e
 
 
-class SkillViewSet(viewsets.ModelViewSet):
-    queryset = Skill.objects.select_related("user").filter(is_active=True)
-    serializer_class = SkillSerializer
-    lookup_field = "user__slug_id"
-    permission_classes = [permissions.IsAuthenticated]
-
-    def perform_create(self, serializer):
-        try:
-            skill = serializer.save()
-            RestLog.objects.create(
-                user=self.request.user if self.request.user.is_authenticated else None,
-                action="Skill Created",
-                request_data=self.request.data,
-                response_data=SkillSerializer(skill).data,
-            )
-        except Exception as e:
-            ErrorLog.objects.create(
-                user=self.request.user if self.request.user.is_authenticated else None,
-                error_message="Skill creation failed",
-                stack_trace=str(e),
-                request_data=self.request.data,
-            )
-            raise e
-
-    def perform_update(self, serializer):
-        try:
-            skill = serializer.save()
-            RestLog.objects.create(
-                user=self.request.user if self.request.user.is_authenticated else None,
-                action="Skill Updated",
-                request_data=self.request.data,
-                response_data=SkillSerializer(skill).data,
-            )
-        except Exception as e:
-            ErrorLog.objects.create(
-                user=self.request.user if self.request.user.is_authenticated else None,
-                error_message="Skill update failed",
-                stack_trace=str(e),
-                request_data=self.request.data,
-            )
-            raise e
-
-    def perform_destroy(self, instance):
-        try:
-            instance.delete()
-            RestLog.objects.create(
-                user=self.request.user if self.request.user.is_authenticated else None,
-                action="Skill Deleted",
-                request_data=self.request.data,
-                response_data={"id": instance.id},
-            )
-        except Exception as e:
-            ErrorLog.objects.create(
-                user=self.request.user if self.request.user.is_authenticated else None,
-                error_message="Skill deletion failed",
-                stack_trace=str(e),
-                request_data=self.request.data,
-            )
-            raise e
-
-
 class SocialMedaiViewSet(viewsets.ModelViewSet):
     queryset = SocialMedia.objects.select_related(
         "user").filter(is_active=True)
@@ -249,6 +188,67 @@ class SocialMedaiViewSet(viewsets.ModelViewSet):
             ErrorLog.objects.create(
                 user=self.request.user if self.request.user.is_authenticated else None,
                 error_message="SocialMedia deletion failed",
+                stack_trace=str(e),
+                request_data=self.request.data,
+            )
+            raise e
+
+
+class UserSkillViewSet(viewsets.ModelViewSet):
+    queryset = UserSkill.objects.select_related("user").filter(is_active=True)
+    serializer_class = UserSkill
+    lookup_field = "user__slug_id"
+    permission_classes = [permissions.IsAuthenticated]
+
+    def perform_create(self, serializer):
+        try:
+            user_skill = serializer.save()
+            RestLog.objects.create(
+                user=self.request.user if self.request.user.is_authenticated else None,
+                action="User Skill Created",
+                request_data=self.request.data,
+                response_data=UserSkillSerializer(user_skill).data,
+            )
+        except Exception as e:
+            ErrorLog.objects.create(
+                user=self.request.user if self.request.user.is_authenticated else None,
+                error_message="User Skill creation failed",
+                stack_trace=str(e),
+                request_data=self.request.data,
+            )
+            raise e
+
+    def perform_update(self, serializer):
+        try:
+            user_skill = serializer.save()
+            RestLog.objects.create(
+                user=self.request.user if self.request.user.is_authenticated else None,
+                action="User Skill Updated",
+                request_data=self.request.data,
+                response_data=UserSkillSerializer(user_skill).data,
+            )
+        except Exception as e:
+            ErrorLog.objects.create(
+                user=self.request.user if self.request.user.is_authenticated else None,
+                error_message="User Skill update failed",
+                stack_trace=str(e),
+                request_data=self.request.data,
+            )
+            raise e
+
+    def perform_destroy(self, instance):
+        try:
+            instance.delete()
+            RestLog.objects.create(
+                user=self.request.user if self.request.user.is_authenticated else None,
+                action="User Skill Deleted",
+                request_data=self.request.data,
+                response_data={"id": instance.id},
+            )
+        except Exception as e:
+            ErrorLog.objects.create(
+                user=self.request.user if self.request.user.is_authenticated else None,
+                error_message="User Skill deletion failed",
                 stack_trace=str(e),
                 request_data=self.request.data,
             )

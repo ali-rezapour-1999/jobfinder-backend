@@ -1,19 +1,8 @@
 from django.db import models
-from user.models import BaseModel, CustomUser
+from user.models import CustomUser
+from base.models import BaseModel
 from django.utils import timezone
-from taggit.managers import TaggableManager
-
-
-class Tag(BaseModel):
-    title = models.CharField(max_length=50, unique=True)
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        db_table = '"blog"."tag"'
-        verbose_name = "Tag"
-        verbose_name_plural = "Tag"
+from base.models import Tags
 
 
 class Category(BaseModel):
@@ -39,7 +28,7 @@ class Post(BaseModel):
         choices=[("draft", "Draft"), ("published", "Published")],
         default="draft",
     )
-    tags = models.ManyToManyField("Tag", related_name="posts", blank=True)
+    tags = models.ManyToManyField(Tags, related_name="posts", blank=True)
     categories = models.ForeignKey(
         "Category", on_delete=models.CASCADE, related_name="posts", blank=True
     )

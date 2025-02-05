@@ -4,7 +4,7 @@ from django.contrib.auth.models import (
     PermissionsMixin,
 )
 from django.db import models
-from core.utils import generate_unique_id, validate_iranian_phone_number
+from base.utils import generate_unique_id, validate_iranian_phone_number
 
 
 class CustomUserManager(BaseUserManager):
@@ -58,33 +58,3 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.email
-
-
-class BaseModel(models.Model):
-    slug_id = models.SlugField(
-        max_length=8,
-        unique=True,
-        blank=True,
-        default=generate_unique_id,
-        editable=False,
-    )
-    create_by = models.ForeignKey(
-        CustomUser,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name="%(class)s_create_by",
-    )
-    updated_by = models.ForeignKey(
-        CustomUser,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name="%(class)s_updated_by",
-    )
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    is_active = models.BooleanField(default=True)
-
-    class Meta:
-        abstract = True

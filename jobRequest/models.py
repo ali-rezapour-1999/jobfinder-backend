@@ -1,7 +1,8 @@
 from django.db import models
 
 from job.models import Job
-from user.models import BaseModel, CustomUser
+from user.models import CustomUser
+from base.models import BaseModel
 
 
 class JobRequest(BaseModel):

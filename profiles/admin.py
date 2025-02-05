@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Profile, Skill, SocialMedia, UserSkill, WorkHistory
+from .models import Profile, SocialMedia, UserSkill, WorkHistory
 
 
 @admin.register(SocialMedia)
@@ -39,7 +39,7 @@ class ProfileAdmin(admin.ModelAdmin):
                     "user",
                     "age",
                     "gender",
-                    "my_skill",
+                    "intersting",
                 )
             },
         ),
@@ -65,14 +65,6 @@ class WorkHistoryAdmin(admin.ModelAdmin):
         "end_date",
         "job_description",
     )
-
-
-@admin.register(Skill)
-class SkillAdmin(admin.ModelAdmin):
-    list_display = ("name",)
-    search_fields = ("name",)
-    readonly_fields = ("created_at", "updated_at", "slug_id")
-    ordering = ("name",)
 
 
 @admin.register(UserSkill)

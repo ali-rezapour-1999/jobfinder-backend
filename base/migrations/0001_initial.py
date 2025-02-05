@@ -13,21 +13,19 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='JobRequest',
+            name='Tags',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('slug_id', models.SlugField(blank=True, default=base.utils.generate_unique_id, editable=False, max_length=8, unique=True)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
                 ('is_active', models.BooleanField(default=True)),
-                ('description', models.TextField()),
-                ('is_accepted', models.BooleanField(default=False)),
-                ('is_cancelled', models.BooleanField(default=False)),
+                ('title', models.CharField(max_length=100, unique=True)),
             ],
             options={
-                'verbose_name': 'Job Request',
-                'verbose_name_plural': 'Job Requests',
-                'db_table': '"job_request"."job_request"',
+                'verbose_name': 'Tags',
+                'verbose_name_plural': 'Tags',
+                'db_table': '"base"."tags"',
             },
         ),
     ]

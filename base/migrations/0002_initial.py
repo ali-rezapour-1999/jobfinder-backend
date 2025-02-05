@@ -10,30 +10,19 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('job', '0002_initial'),
-        ('jobRequest', '0001_initial'),
+        ('base', '0001_initial'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='jobrequest',
+            model_name='tags',
             name='create_by',
             field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(class)s_create_by', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
-            model_name='jobrequest',
-            name='request_job',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='job_request_job', to='job.job'),
-        ),
-        migrations.AddField(
-            model_name='jobrequest',
+            model_name='tags',
             name='updated_by',
             field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(class)s_updated_by', to=settings.AUTH_USER_MODEL),
-        ),
-        migrations.AddField(
-            model_name='jobrequest',
-            name='user',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='job_request_user', to=settings.AUTH_USER_MODEL),
         ),
     ]

@@ -1,6 +1,7 @@
 from django.db import models
 
-from user.models import CustomUser, BaseModel
+from user.models import CustomUser
+from base.models import BaseModel
 
 
 class ErrorLog(BaseModel):

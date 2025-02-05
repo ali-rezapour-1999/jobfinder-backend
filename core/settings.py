@@ -24,6 +24,7 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt",
     "corsheaders",
     # -----------------
+    "base",
     "user",
     "profiles",
     "job",
@@ -112,7 +113,9 @@ DATABASES = {
         "PASSWORD": "admin",
         "HOST": "localhost",
         "PORT": "5432",
-        "OPTIONS": {"options": "-c search_path=auth,profile,log,job,job_request,blog"},
+        "OPTIONS": {
+            "options": "-c search_path=auth,profile,log,job,job_request,blog,base"
+        },
     }
 }
 

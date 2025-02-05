@@ -1,27 +1,8 @@
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-
-from user.middleware import get_current_user
-from user.models import BaseModel, CustomUser
-
-
-class Skill(BaseModel):
-    name = models.CharField(max_length=100, unique=True)
-
-    class Meta:
-        db_table = '"profile"."skill"'
-        verbose_name = "Skill"
-        verbose_name_plural = "Skill"
-
-    def save(self, *args, **kwargs):
-        user = get_current_user()
-        if not self.pk:
-            self.create_by = user
-        self.updated_by = user
-        super().save(*args, **kwargs)
-
-    def __str__(self):
-        return self.name
+from base.models import Tags
+from user.models import CustomUser
+from base.models import BaseModel
 
 
 class Profile(BaseModel):
@@ -40,7 +21,7 @@ class Profile(BaseModel):
     city = models.CharField(max_length=100, blank=True, null=True)
     address = models.TextField(blank=True, null=True)
     description_myself = models.TextField(blank=True, null=True)
-    my_skill = models.ManyToManyField(Skill, related_name="my_skill")
+    intersting = models.ManyToManyField(Tags, related_name="intersting_tag")
 
     def __str__(self):
         return f"{self.user.first_last_name}"
@@ -76,7 +57,7 @@ class UserSkill(BaseModel):
         CustomUser, on_delete=models.CASCADE, related_name="user_skills"
     )
     skill_reference = models.ForeignKey(
-        Skill, on_delete=models.CASCADE, related_name="related_skill"
+        Tags, on_delete=models.CASCADE, related_name="related_skill"
     )
     year = models.PositiveIntegerField()
     moon = models.PositiveIntegerField()
