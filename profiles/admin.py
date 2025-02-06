@@ -39,7 +39,6 @@ class ProfileAdmin(admin.ModelAdmin):
                     "user",
                     "age",
                     "gender",
-                    "intersting",
                 )
             },
         ),
@@ -51,8 +50,7 @@ class ProfileAdmin(admin.ModelAdmin):
 
 @admin.register(WorkHistory)
 class WorkHistoryAdmin(admin.ModelAdmin):
-    list_display = ("user", "job_title", "company_name",
-                    "start_date", "end_date")
+    list_display = ("user", "job_title", "company_name", "start_date", "end_date")
     list_filter = ("company_name", "start_date", "end_date")
     search_fields = ("job_title", "company_name")
     date_hierarchy = "start_date"

@@ -6,22 +6,15 @@ from base.models import BaseModel
 
 
 class Profile(BaseModel):
-    gender_choices = [
-        ("M", "Male"),
-        ("F", "Female"),
-    ]
     user = models.OneToOneField(
         CustomUser, on_delete=models.CASCADE, related_name="profile"
     )
+    gender = models.CharField(max_length=12, blank=True, null=True)
     age = models.PositiveIntegerField(blank=True, null=True)
-    gender = models.CharField(
-        max_length=1, choices=gender_choices, blank=True, null=True
-    )
     state = models.CharField(max_length=100, blank=True, null=True)
     city = models.CharField(max_length=100, blank=True, null=True)
     address = models.TextField(blank=True, null=True)
     description_myself = models.TextField(blank=True, null=True)
-    intersting = models.ManyToManyField(Tags, related_name="intersting_tag")
 
     def __str__(self):
         return f"{self.user.first_last_name}"

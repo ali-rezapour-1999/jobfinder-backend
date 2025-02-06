@@ -11,9 +11,9 @@ from .serializers import (
 
 class ProfileViewSet(viewsets.ModelViewSet):
     queryset = Profile.objects.select_related("user").filter(is_active=True)
-    serializer_class = ProfileSerializer
     lookup_field = "user__slug_id"
-    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = ProfileSerializer
+    permission_classes = [permissions.AllowAny]
 
     def perform_create(self, serializer):
         try:
@@ -71,11 +71,10 @@ class ProfileViewSet(viewsets.ModelViewSet):
 
 
 class WorkHistoryViewSet(viewsets.ModelViewSet):
-    queryset = WorkHistory.objects.select_related(
-        "user").filter(is_active=True)
+    queryset = WorkHistory.objects.select_related("user").filter(is_active=True)
     serializer_class = WorkHistorySerializer
     lookup_field = "user__slug_id"
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
 
     def perform_create(self, serializer):
         try:
@@ -133,8 +132,7 @@ class WorkHistoryViewSet(viewsets.ModelViewSet):
 
 
 class SocialMedaiViewSet(viewsets.ModelViewSet):
-    queryset = SocialMedia.objects.select_related(
-        "user").filter(is_active=True)
+    queryset = SocialMedia.objects.select_related("user").filter(is_active=True)
     serializer_class = SocialMediaSerializer
     lookup_field = "user__slug_id"
     permission_classes = [permissions.IsAuthenticated]

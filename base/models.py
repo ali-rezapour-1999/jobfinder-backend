@@ -1,5 +1,5 @@
-from django.db import models
 from user.middleware import get_current_user
+from django.db import models
 from base.utils import generate_unique_id
 from user.models import CustomUser
 
@@ -50,4 +50,4 @@ class Tags(BaseModel):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return self.name
+        return self.title
