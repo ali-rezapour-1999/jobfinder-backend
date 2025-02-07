@@ -22,6 +22,7 @@ class SocialMediaAdmin(admin.ModelAdmin):
                     "tags",
                     "views",
                     "image",
+                    "is_approve",
                 )
             },
         ),

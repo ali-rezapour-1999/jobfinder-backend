@@ -1,30 +1,32 @@
-from django.contrib.auth.models import models
+from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
-
 from user.models import CustomUser
-from base.models import BaseModel
+from base.models import BaseModel, Tags
 
 
 class Job(BaseModel):
     user = models.ForeignKey(
-        CustomUser, on_delete=models.CASCADE, related_name="user")
+        CustomUser, on_delete=models.CASCADE, related_name="jobs")
     title = models.CharField(max_length=255, null=False, blank=True)
     main_title = models.CharField(max_length=255, null=False, blank=True)
     job_image = models.ImageField(
         upload_to="job_images/", null=True, blank=True)
-    desciption = models.TextField()
+    description = models.TextField()
+    tags = models.ManyToManyField(Tags, related_name="jobs")
+    is_approve = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"{self.title} and {self.user}"
+        return f"{self.title} - {self.user}"
 
     class Meta:
         db_table = '"job"."job"'
-        verbose_name = "job"
-        verbose_name_plural = "job"
+        verbose_name = "Job"
+        verbose_name_plural = "Jobs"
 
 
 class SkillNeeded(BaseModel):
-    job = models.ManyToManyField(Job, related_name="job_skillneeded")
+    job = models.ForeignKey(
+        Job, on_delete=models.CASCADE, related_name="skills")
     title = models.CharField(max_length=255, null=True, blank=True)
     level = models.DecimalField(
         max_digits=5,
@@ -34,23 +36,24 @@ class SkillNeeded(BaseModel):
     description = models.TextField()
 
     def __str__(self):
-        return f"{self.title} and {self.job}"
+        return f"{self.title} - {self.job.title}"
 
     class Meta:
         db_table = '"job"."skill_needed"'
-        verbose_name = "job_skillneeded"
-        verbose_name_plural = "job_skillneeded"
+        verbose_name = "Skill Needed"
+        verbose_name_plural = "Skills Needed"
 
 
-class JobOptions(BaseModel):
-    job = models.ManyToManyField(Job, related_name="job_options")
+class JobOption(BaseModel):
+    job = models.ForeignKey(
+        Job, on_delete=models.CASCADE, related_name="options")
     title = models.CharField(max_length=255)
     description = models.TextField()
 
     def __str__(self):
-        return f"{self.title} and {self.job}"
+        return f"{self.title} - {self.job.title}"
 
     class Meta:
-        db_table = '"job"."job_options"'
-        verbose_name = "job_options"
-        verbose_name_plural = "job_options"
+        db_table = '"job"."job_option"'
+        verbose_name = "Job Option"
+        verbose_name_plural = "Job Options"

@@ -35,6 +35,7 @@ class Post(BaseModel):
     image = models.ImageField(upload_to="blog/%Y/%m/%d/", blank=True)
     views = models.PositiveIntegerField(default=0)
     publish = models.DateTimeField(default=timezone.now)
+    is_approve = models.BooleanField(default=False)
 
     def __str__(self):
         return self.title
