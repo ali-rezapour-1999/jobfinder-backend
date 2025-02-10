@@ -23,11 +23,8 @@ class UserLoginSerializer(serializers.Serializer):
     password = serializers.CharField(write_only=True)
 
 
-class GoogleLoginSerializer(serializers.Serializer):
-    id_token = serializers.CharField()
-
-
 class UserDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = "__all__"
+        lookup_field = "email"

@@ -1,24 +1,26 @@
-from django.conf import settings
 from django.contrib.auth import authenticate, get_user_model
-from google.auth.transport import requests
-from google.oauth2 import id_token
 from rest_framework import generics, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from django.core.files.base import ContentFile
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
-
 from log.models import ErrorLog, RestLog
 from user.models import CustomUser
+from dj_rest_auth.registration.views import SocialLoginView
+from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
+from allauth.socialaccount.providers.oauth2.client import OAuth2Client
+import logging
+import requests
 
 from .serializers import (
-    GoogleLoginSerializer,
     UserDetailSerializer,
     UserLoginSerializer,
     UserRegistrationSerializer,
 )
 
 User = get_user_model()
+logger = logging.getLogger("user")
 
 
 class UserRegistrationView(generics.CreateAPIView):
@@ -116,65 +118,11 @@ class UserLoginView(generics.GenericAPIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class GoogleLoginView(generics.GenericAPIView):
-    permission_classes = [AllowAny]
-    serializer_class = GoogleLoginSerializer
-
-    def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
-            try:
-                id_info = id_token.verify_oauth2_token(
-                    serializer.validated_data["id_token"],
-                    requests.Request(),
-                    settings.GOOGLE_CLIENT_ID,
-                )
-                user, created = User.objects.get_or_create(
-                    google_id=id_info["sub"],
-                    defaults={"email": id_info["email"], "is_active": True},
-                )
-                refresh = RefreshToken.for_user(user)
-                RestLog.objects.create(
-                    user=user,
-                    action="Google Login",
-                    request_data=request.data,
-                    response_data={
-                        "refresh": str(refresh),
-                        "access": str(refresh.access_token),
-                        "user": {"email": user.email, "is_new": created},
-                    },
-                )
-                return Response(
-                    {
-                        "refresh": str(refresh),
-                        "access": str(refresh.access_token),
-                        "user": {"email": user.email, "is_new": created},
-                    }
-                )
-            except ValueError as e:
-                ErrorLog.objects.create(
-                    user=None,
-                    error_message="Invalid Google token",
-                    stack_trace=str(e),
-                    request_data=request.data,
-                )
-                return Response(
-                    {"error": "Invalid Google token"},
-                    status=status.HTTP_401_UNAUTHORIZED,
-                )
-        ErrorLog.objects.create(
-            user=None,
-            error_message="Invalid Google login request data",
-            request_data=serializer.errors,
-        )
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
 class UserProfileViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.filter(is_active=True)
     serializer_class = UserDetailSerializer
     lookup_field = "slug_id"
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     @action(detail=False, methods=["get"])
     def me(self, request):
@@ -186,3 +134,72 @@ class UserProfileViewSet(viewsets.ModelViewSet):
             response_data=serializer.data,
         )
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class GoogleLogin(SocialLoginView):
+    adapter_class = GoogleOAuth2Adapter
+    client_class = OAuth2Client
+    permission_classes = [AllowAny]
+
+    def post(self, request, *args, **kwargs):
+        logger.debug(f"Request data: {request.data}")
+
+        try:
+            access_token = request.data.get("access_token")
+            user_info = self.get_google_user_info(access_token)
+
+            logger.debug(f"User info from Google: {user_info}")
+
+            user = self.create_or_update_user(user_info)
+
+            return Response(
+                {"message": "User logged in successfully", "user_id": user.id},
+                status=status.HTTP_200_OK,
+            )
+
+        except Exception as e:
+            logger.error(f"Google login failed: {str(e)}")
+            logger.debug(f"Request data: {request.data}")
+            ErrorLog.objects.create(
+                user=None,
+                error_message=f"Google login failed: {str(e)}",
+                request_data=request.data,
+            )
+            return Response(
+                {"error": "GOOGLE_LOGIN_FAILED"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+    def get_google_user_info(self, access_token):
+        url = "https://www.googleapis.com/oauth2/v3/userinfo"
+        headers = {"Authorization": f"Bearer {access_token}"}
+        response = requests.get(url, headers=headers)
+
+        if response.status_code != 200:
+            raise Exception(f"Failed to get user info from Google: {response.text}")
+
+        return response.json()
+
+    def create_or_update_user(self, user_info):
+        user_model = get_user_model()
+        user = user_model.objects.filter(email=user_info.get("email")).first()
+
+        if not user:
+            user = user_model.objects.create(
+                email=user_info.get("email"),
+                username=user_info.get("name", "").replace(" ", "_").lower(),
+                slug_id=user_info.get("sub", "")[:21],
+            )
+
+        picture_url = user_info.get("picture")
+        if picture_url:
+            response = requests.get(picture_url)
+            if response.status_code == 200:
+                user.profile_image.save(
+                    f"profile_{user.slug_id}.jpg",
+                    ContentFile(response.content),
+                    save=False,
+                )
+
+        user.save()
+        return user

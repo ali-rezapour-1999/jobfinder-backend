@@ -1,20 +1,40 @@
-version: "3"
 services:
-  db:
-    image: postgres:latest
-    environment:
-      POSTGRES_DB: jobdata
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: admin
+  django:
+    container_name: django
+    build:
+      context: ./core
+    command: python manage.py runserver 0.0.0.0:8000
+    working_dir: /usr/src/app
+    volumes:
+      - ./core/:/usr/src/app
     ports:
-      - "5434:5433"
-
-  web:
-    build: .
-    command: ./wait-for-it.sh db:5432 -- python manage.py runserver 0.0.0.0:8000
+      - "8001:8000"
+    environment:
+      - DEBUG=1
+      - SECRET_KEY=django-insecure-=kgj-r@@v+6neh1-9*vgd=@#q9()5n(o^fq(70)b8vs4%c%co!
+      - ALLOWED_HOSTS=localhost,127.0.0.1
     depends_on:
-      - db
+      redis:
+        condition: service_healthy
+
+  redis:
+    image: redis:latest
+    container_name: redis
     ports:
-      - "8000:8000"
-    environment:
-      - DATABASE_URL=postgres://postgres:admin@db:5432/jobdata
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      retries: 5
+      timeout: 3s
+
+  celery:
+    container_name: celery
+    build:
+      context: ./core
+    command: celery -A core worker --loglevel=info
+    volumes:
+      - ./core/:/usr/src/app
+    depends_on:
+      redis:
+        condition: service_healthy

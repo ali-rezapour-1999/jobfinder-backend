@@ -4,7 +4,7 @@ import re
 
 
 def generate_unique_id():
-    return str(uuid.uuid4())[:8]
+    return uuid.uuid4().hex[:21]
 
 
 def validate_iranian_phone_number(value):

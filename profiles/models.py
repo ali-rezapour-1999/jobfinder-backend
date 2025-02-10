@@ -17,7 +17,7 @@ class Profile(BaseModel):
     description_myself = models.TextField(blank=True, null=True)
 
     def __str__(self):
-        return f"{self.user.first_last_name}"
+        return f"{self.user.username}"
 
     class Meta:
         db_table = '"profile"."profile"'

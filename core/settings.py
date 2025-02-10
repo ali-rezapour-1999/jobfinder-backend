@@ -1,16 +1,20 @@
 from datetime import timedelta
 from pathlib import Path
+import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = "django-insecure-=kgj-r@@v+6neh1-9*vgd=@#q9()5n(o^fq(70)b8vs4%c%co!"
+SECRET_KEY = os.environ.get("SECRET_KEY", "default_secret_key")
 
-DEBUG = True
+DEBUG = os.environ.get("DEBUG", "True").lower() in ("true", "1", "t")
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = (
+    os.environ.get("ALLOWED_HOSTS", "").split(",")
+    if os.environ.get("ALLOWED_HOSTS")
+    else []
+)
 
 # Application definition
-
 INSTALLED_APPS = [
     "jazzmin",
     "django.contrib.admin",
@@ -22,7 +26,13 @@ INSTALLED_APPS = [
     # -----------------
     "rest_framework",
     "rest_framework_simplejwt",
+    "rest_framework.authtoken",
     "corsheaders",
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    "allauth.socialaccount.providers.google",
+    "social_django",
     # -----------------
     "base",
     "user",
@@ -33,13 +43,46 @@ INSTALLED_APPS = [
     "blog",
 ]
 
-
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ],
 }
 
+
+# Google Auth Settings
+ACCOUNT_LOGIN_METHODS = {"email"}
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
+
+AUTHENTICATION_BACKENDS = (
+    "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
+)
+
+SOCIALACCOUNT_PROVIDERS = {
+    "google": {
+        "SCOPE": ["profile", "email"],
+        "AUTH_PARAMS": {"access_type": "online"},
+        "OAUTH_PKCE_ENABLED": True,
+    }
+}
+
+
+# JWT Settings
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(weeks=1),
+    "REFRESH_TOKEN_LIFETIME": timedelta(weeks=1),
+    "ROTATE_REFRESH_TOKENS": True,
+}
+
+CELERY_BROKER_URL = "redis://redis:6379/0"
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -49,32 +92,20 @@ MIDDLEWARE = [
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
-    "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "user.middleware.CurrentUserMiddleware",
+    "allauth.account.middleware.AccountMiddleware",
 ]
 
 ROOT_URLCONF = "core.urls"
 
-CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "https://jeraghe.vercel.app",
 ]
 CORS_ALLOW_CREDENTIALS = True
-
-CORS_EXPOSE_HEADERS = [
-    "Content-Type",
-    "Authorization",
-    "X-CSRFToken",
-    "Strict-Transport-Security",
-]
-
 CORS_ALLOW_HEADERS = [
     "authorization",
     "content-type",
     "x-csrftoken",
-    "access-control-allow-origin",
-    "strict-origin-when-cross-origin",
 ]
 
 TEMPLATES = [
@@ -97,14 +128,6 @@ WSGI_APPLICATION = "core.wsgi.application"
 
 
 # Database
-
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.sqlite3",
-#         "NAME": BASE_DIR / "db.sqlite3",
-#     }
-# }
-
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
@@ -137,34 +160,44 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-# Internationalization
-
-LANGUAGE_CODE = "en-us"
-
+ANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"
-
 USE_I18N = True
-
 USE_TZ = True
 
+# Static and Media
 STATIC_URL = "static/"
-
-DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
 MEDIA_URL = "/media/"
-
 MEDIA_ROOT = BASE_DIR / "media"
 
-STATIC_URL = "static/"
-
+# User Model
 AUTH_USER_MODEL = "user.CustomUser"
 
-GOOGLE_CLIENT_ID = (
-    "441487544545-kmj3u1q48n9quk02c0tu1bpn1adms92e.apps.googleusercontent.com"
-)
 
-SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(weeks=1),
-    "REFRESH_TOKEN_LIFETIME": timedelta(weeks=1),
-    "ROTATE_REFRESH_TOKENS": True,
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "level": "DEBUG",
+            "class": "logging.StreamHandler",
+        },
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console"],
+            "level": "DEBUG",
+            "propagate": True,
+        },
+        "user": {
+            "handlers": ["console"],
+            "level": "DEBUG",
+            "propagate": True,
+        },
+        "profile": {
+            "handlers": ["console"],
+            "level": "DEBUG",
+            "propagate": True,
+        },
+    },
 }

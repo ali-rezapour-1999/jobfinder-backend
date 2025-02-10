@@ -13,7 +13,7 @@ class CustomUserAdmin(BaseUserAdmin):
                 "fields": (
                     "slug_id",
                     "email",
-                    "first_last_name",
+                    "username",
                     "password",
                 )
             },

@@ -6,7 +6,7 @@ from user.models import CustomUser
 
 class BaseModel(models.Model):
     slug_id = models.SlugField(
-        max_length=8,
+        max_length=255,
         unique=True,
         blank=True,
         default=generate_unique_id,
