@@ -9,6 +9,7 @@ from user.models import CustomUser
 from dj_rest_auth.registration.views import SocialLoginView
 import logging
 import requests
+from base.utils import generate_unique_id
 
 from .serializers import (
     UserDetailSerializer,
@@ -27,7 +28,7 @@ class UserRegistrationView(generics.CreateAPIView):
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
-            user = serializer.save()
+            user = serializer.save(slug_id=generate_unique_id())
             refresh = RefreshToken.for_user(user)
             RestLog.objects.create(
                 user=user,
@@ -173,8 +174,11 @@ class GoogleLogin(SocialLoginView):
     def get_google_user_info(self, access_token):
         url = "https://www.googleapis.com/oauth2/v3/userinfo"
         headers = {"Authorization": f"Bearer {access_token}"}
-        response = requests.get(url, headers=headers)
-
+        proxies = {
+            "https": "182.253.93.3:53281",
+            "http": "182.253.93.3:53281",
+        }
+        response = requests.get(url, headers=headers, proxies=proxies)
         if response.status_code != 200:
             raise Exception(f"Failed to get user info from Google: {response.text}")
 
