@@ -11,7 +11,7 @@ from .serializers import (
 
 class ProfileViewSet(viewsets.ModelViewSet):
     queryset = Profile.objects.select_related("user").filter(is_active=True)
-    lookup_field = "user__email"
+    lookup_field = "user__slug_id"
     serializer_class = ProfileSerializer
     permission_classes = [permissions.AllowAny]
 
@@ -71,10 +71,9 @@ class ProfileViewSet(viewsets.ModelViewSet):
 
 
 class WorkHistoryViewSet(viewsets.ModelViewSet):
-    queryset = WorkHistory.objects.select_related(
-        "user").filter(is_active=True)
+    queryset = WorkHistory.objects.select_related("user").filter(is_active=True)
     serializer_class = WorkHistorySerializer
-    lookup_field = "user__email"
+    lookup_field = "user__slug_id"
     permission_classes = [permissions.AllowAny]
 
     def perform_create(self, serializer):
@@ -133,10 +132,9 @@ class WorkHistoryViewSet(viewsets.ModelViewSet):
 
 
 class SocialMedaiViewSet(viewsets.ModelViewSet):
-    queryset = SocialMedia.objects.select_related(
-        "user").filter(is_active=True)
+    queryset = SocialMedia.objects.select_related("user").filter(is_active=True)
     serializer_class = SocialMediaSerializer
-    lookup_field = "user__email"
+    lookup_field = "user__slug_id"
     permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
@@ -197,7 +195,7 @@ class SocialMedaiViewSet(viewsets.ModelViewSet):
 class UserSkillViewSet(viewsets.ModelViewSet):
     queryset = UserSkill.objects.select_related("user").filter(is_active=True)
     serializer_class = UserSkill
-    lookup_field = "user__email"
+    lookup_field = "user__slug_id"
     permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):

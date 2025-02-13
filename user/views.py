@@ -2,14 +2,11 @@ from django.contrib.auth import authenticate, get_user_model
 from rest_framework import generics, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from django.core.files.base import ContentFile
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from log.models import ErrorLog, RestLog
 from user.models import CustomUser
 from dj_rest_auth.registration.views import SocialLoginView
-from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
-from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 import logging
 import requests
 
@@ -122,7 +119,7 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.filter(is_active=True)
     serializer_class = UserDetailSerializer
     lookup_field = "slug_id"
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     @action(detail=False, methods=["get"])
     def me(self, request):
@@ -137,37 +134,40 @@ class UserProfileViewSet(viewsets.ModelViewSet):
 
 
 class GoogleLogin(SocialLoginView):
-    adapter_class = GoogleOAuth2Adapter
-    client_class = OAuth2Client
-    permission_classes = [AllowAny]
-
     def post(self, request, *args, **kwargs):
-        logger.debug(f"Request data: {request.data}")
-
         try:
             access_token = request.data.get("access_token")
-            user_info = self.get_google_user_info(access_token)
 
+            if not access_token:
+                return Response(
+                    {"error": "NO_GOOGLE_ACCESS_TOKEN"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            user_info = self.get_google_user_info(access_token)
             logger.debug(f"User info from Google: {user_info}")
 
             user = self.create_or_update_user(user_info)
 
+            refresh = RefreshToken.for_user(user)
+            access = str(refresh.access_token)
+
             return Response(
-                {"message": "User logged in successfully", "user_id": user.id},
+                {
+                    "refresh": str(refresh),
+                    "access": access,
+                    "user": {
+                        "email": user.email,
+                        "slug": user.slug_id,
+                    },
+                },
                 status=status.HTTP_200_OK,
             )
 
         except Exception as e:
             logger.error(f"Google login failed: {str(e)}")
-            logger.debug(f"Request data: {request.data}")
-            ErrorLog.objects.create(
-                user=None,
-                error_message=f"Google login failed: {str(e)}",
-                request_data=request.data,
-            )
             return Response(
-                {"error": "GOOGLE_LOGIN_FAILED"},
-                status=status.HTTP_400_BAD_REQUEST,
+                {"error": "GOOGLE_LOGIN_FAILED"}, status=status.HTTP_400_BAD_REQUEST
             )
 
     def get_google_user_info(self, access_token):
@@ -181,25 +181,11 @@ class GoogleLogin(SocialLoginView):
         return response.json()
 
     def create_or_update_user(self, user_info):
-        user_model = get_user_model()
-        user = user_model.objects.filter(email=user_info.get("email")).first()
-
-        if not user:
-            user = user_model.objects.create(
-                email=user_info.get("email"),
-                username=user_info.get("name", "").replace(" ", "_").lower(),
-                slug_id=user_info.get("sub", "")[:21],
-            )
-
-        picture_url = user_info.get("picture")
-        if picture_url:
-            response = requests.get(picture_url)
-            if response.status_code == 200:
-                user.profile_image.save(
-                    f"profile_{user.slug_id}.jpg",
-                    ContentFile(response.content),
-                    save=False,
-                )
-
-        user.save()
+        user, created = User.objects.get_or_create(
+            email=user_info["email"],
+            defaults={
+                "username": user_info["name"].replace(" ", "_").lower(),
+                "slug_id": user_info["sub"][:21],
+            },
+        )
         return user
