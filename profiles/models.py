@@ -20,7 +20,6 @@ class Profile(BaseModel):
         return f"{self.user.username}"
 
     class Meta:
-        db_table = '"profile"."profile"'
         verbose_name = "Profile"
         verbose_name_plural = "Profile"
 
@@ -40,7 +39,6 @@ class WorkHistory(BaseModel):
         return f"{self.job_title} at {self.company_name}"
 
     class Meta:
-        db_table = '"profile"."work_history"'
         verbose_name = "WorkHistory"
         verbose_name_plural = "WorkHistory"
 
@@ -66,7 +64,6 @@ class UserSkill(BaseModel):
         return f"{self.user} - {self.skill_reference}"
 
     class Meta:
-        db_table = '"profile"."user_skill"'
         verbose_name = "UserSkill"
         verbose_name_plural = "UserSkills"
 
@@ -79,7 +76,6 @@ class SocialMedia(BaseModel):
     title = models.CharField(max_length=255, null=False, blank=False)
 
     class Meta:
-        db_table = '"profile"."social_media"'
         verbose_name = "SocialMedia"
         verbose_name_plural = "SocialMedia"
 

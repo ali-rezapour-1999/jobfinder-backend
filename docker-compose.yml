@@ -2,11 +2,11 @@ services:
   django:
     container_name: django
     build:
-      context: ./core
+      context: .
     command: python manage.py runserver 0.0.0.0:8000
     working_dir: /usr/src/app
     volumes:
-      - ./core/:/usr/src/app
+      - .:/usr/src/app
     ports:
       - "8001:8000"
     environment:
@@ -31,10 +31,10 @@ services:
   celery:
     container_name: celery
     build:
-      context: ./core
+      context: .
     command: celery -A core worker --loglevel=info
     volumes:
-      - ./core/:/usr/src/app
+      - .:/usr/src/app
     depends_on:
       redis:
         condition: service_healthy

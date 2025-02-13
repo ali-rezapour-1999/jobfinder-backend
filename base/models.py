@@ -38,7 +38,6 @@ class Tags(BaseModel):
     title = models.CharField(max_length=100, unique=True)
 
     class Meta:
-        db_table = '"base"."tags"'
         verbose_name = "Tags"
         verbose_name_plural = "Tags"
 

@@ -17,7 +17,6 @@ class ErrorLog(BaseModel):
         return f"Error at {self.timestamp}: {self.error_message[:40]}"
 
     class Meta:
-        db_table = '"log"."error_log"'
         verbose_name = "error_log"
         verbose_name_plural = "error_log"
 
@@ -35,7 +34,6 @@ class RestLog(BaseModel):
         return f"Action: {self.action} at {self.timestamp}"
 
     class Meta:
-        db_table = '"log"."rest_log"'
         verbose_name = "rest_log"
         verbose_name_plural = "rest_log"
 
@@ -53,6 +51,5 @@ class UserDeviceInfo(BaseModel):
         return f"{self.user_agent} - {self.device_type} - {self.created_at}"
 
     class Meta:
-        db_table = '"log"."user_device_info"'
         verbose_name = "UserDeviceInfo"
         verbose_name_plural = "UserDeviceInfo"

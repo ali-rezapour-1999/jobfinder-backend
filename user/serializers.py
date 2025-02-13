@@ -1,6 +1,5 @@
 from rest_framework import serializers
 from user.models import CustomUser
-from base.utils import generate_unique_id
 
 
 class UserRegistrationSerializer(serializers.ModelSerializer):

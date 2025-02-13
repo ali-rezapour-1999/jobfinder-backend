@@ -50,7 +50,6 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     REQUIRED_FIELDS = []
 
     class Meta:
-        db_table = '"auth"."custom_user"'
         verbose_name = "User"
         verbose_name_plural = "User"
 

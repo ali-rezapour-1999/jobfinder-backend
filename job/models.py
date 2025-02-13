@@ -19,7 +19,6 @@ class Job(BaseModel):
         return f"{self.title} - {self.user}"
 
     class Meta:
-        db_table = '"job"."job"'
         verbose_name = "Job"
         verbose_name_plural = "Jobs"
 
@@ -39,7 +38,6 @@ class SkillNeeded(BaseModel):
         return f"{self.title} - {self.job.title}"
 
     class Meta:
-        db_table = '"job"."skill_needed"'
         verbose_name = "Skill Needed"
         verbose_name_plural = "Skills Needed"
 
@@ -54,6 +52,5 @@ class JobOption(BaseModel):
         return f"{self.title} - {self.job.title}"
 
     class Meta:
-        db_table = '"job"."job_option"'
         verbose_name = "Job Option"
         verbose_name_plural = "Job Options"

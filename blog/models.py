@@ -12,7 +12,6 @@ class Category(BaseModel):
         return self.name
 
     class Meta:
-        db_table = '"blog"."category"'
         verbose_name = "category"
         verbose_name_plural = "category"
 
@@ -42,6 +41,5 @@ class Post(BaseModel):
 
     class Meta:
         ordering = ("-publish",)
-        db_table = '"blog"."post"'
         verbose_name = "post"
         verbose_name_plural = "post"
