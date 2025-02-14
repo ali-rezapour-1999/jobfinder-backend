@@ -26,6 +26,9 @@ ENV PATH="/app/venv/bin:$PATH"
 
 COPY --chown=appuser:appuser . .
 
+
+RUN python manage.py collectstatic --noinput
+
 USER appuser
 
 EXPOSE 8000

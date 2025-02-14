@@ -182,3 +182,5 @@ MEDIA_ROOT = BASE_DIR / "media"
 
 # User Model
 AUTH_USER_MODEL = "user.CustomUser"
+
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
