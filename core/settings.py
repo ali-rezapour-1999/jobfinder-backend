@@ -1,20 +1,20 @@
 from datetime import timedelta
 from pathlib import Path
+from dotenv import load_dotenv
 import os
+
+load_dotenv(".env.local")
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.environ.get("SECRET_KEY", "default_secret_key")
+SECRET_KEY = os.getenv("SECRET_KEY")
 
-DEBUG = os.environ.get("DEBUG", "True").lower() in ("true", "1", "t")
+DEBUG = os.environ.get("DEBUG") == "True"
 
-ALLOWED_HOSTS = (
-    os.environ.get("ALLOWED_HOSTS", "").split(",")
-    if os.environ.get("ALLOWED_HOSTS")
-    else []
-)
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "*").split(",")
 
-# Application definition
+CSRF_TRUSTED_ORIGINS = os.getenv("DJANGO_CSRF_TRUSTED_ORIGINS", "*").split(",")
+
 INSTALLED_APPS = [
     "jazzmin",
     "django.contrib.admin",
@@ -95,6 +95,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "allauth.account.middleware.AccountMiddleware",
+    "log.middlewares.ExceptionLoggingMiddleware",
 ]
 
 ROOT_URLCONF = "core.urls"
@@ -130,14 +131,24 @@ WSGI_APPLICATION = "core.wsgi.application"
 
 
 # Database
+database_engine = os.getenv("DATABASE_ENGINE", "sqlite3")
+
+valid_engines = {
+    "postgresql": "django.db.backends.postgresql",
+    "sqlite3": "django.db.backends.sqlite3",
+}
+
+if database_engine not in valid_engines:
+    raise ValueError(f"Unsupported database engine: {database_engine}")
+
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": "jobdata",
-        "USER": "postgres",
-        "PASSWORD": "admin",
-        "HOST": "localhost",
-        "PORT": "5432",
+        "ENGINE": valid_engines[database_engine],
+        "NAME": os.getenv("DATABASE_NAME", "jobdata"),
+        "USER": os.getenv("DATABASE_USERNAME", "postgres"),
+        "PASSWORD": os.getenv("DATABASE_PASSWORD", "admin"),
+        "HOST": os.getenv("DATABASE_HOST", "127.0.0.1"),
+        "PORT": os.getenv("DATABASE_PORT", "5432"),
     }
 }
 
@@ -171,32 +182,3 @@ MEDIA_ROOT = BASE_DIR / "media"
 
 # User Model
 AUTH_USER_MODEL = "user.CustomUser"
-
-
-# LOGGING = {
-#     "version": 1,
-#     "disable_existing_loggers": False,
-#     "handlers": {
-#         "console": {
-#             "level": "DEBUG",
-#             "class": "logging.StreamHandler",
-#         },
-#     },
-#     "loggers": {
-#         "django": {
-#             "handlers": ["console"],
-#             "level": "DEBUG",
-#             "propagate": True,
-#         },
-#         "user": {
-#             "handlers": ["console"],
-#             "level": "DEBUG",
-#             "propagate": True,
-#         },
-#         "profile": {
-#             "handlers": ["console"],
-#             "level": "DEBUG",
-#             "propagate": True,
-#         },
-#     },
-# }

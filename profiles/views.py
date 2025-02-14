@@ -1,5 +1,5 @@
 from rest_framework import permissions, viewsets
-from log.models import ErrorLog, RestLog
+from log.models import RestLog
 from .models import Profile, WorkHistory, SocialMedia, UserSkill
 from .serializers import (
     ProfileSerializer,
@@ -25,12 +25,6 @@ class ProfileViewSet(viewsets.ModelViewSet):
                 response_data=ProfileSerializer(profile).data,
             )
         except Exception as e:
-            ErrorLog.objects.create(
-                user=self.request.user if self.request.user.is_authenticated else None,
-                error_message="Profile creation failed",
-                stack_trace=str(e),
-                request_data=self.request.data,
-            )
             raise e
 
     def perform_update(self, serializer):
@@ -43,12 +37,6 @@ class ProfileViewSet(viewsets.ModelViewSet):
                 response_data=ProfileSerializer(profile).data,
             )
         except Exception as e:
-            ErrorLog.objects.create(
-                user=self.request.user if self.request.user.is_authenticated else None,
-                error_message="Profile update failed",
-                stack_trace=str(e),
-                request_data=self.request.data,
-            )
             raise e
 
     def perform_destroy(self, instance):
@@ -61,12 +49,6 @@ class ProfileViewSet(viewsets.ModelViewSet):
                 response_data={"slug_id": instance.slug_id},
             )
         except Exception as e:
-            ErrorLog.objects.create(
-                user=self.request.user if self.request.user.is_authenticated else None,
-                error_message="Profile deletion failed",
-                stack_trace=str(e),
-                request_data=self.request.data,
-            )
             raise e
 
 
@@ -86,12 +68,6 @@ class WorkHistoryViewSet(viewsets.ModelViewSet):
                 response_data=WorkHistorySerializer(work_history).data,
             )
         except Exception as e:
-            ErrorLog.objects.create(
-                user=self.request.user if self.request.user.is_authenticated else None,
-                error_message="Work history creation failed",
-                stack_trace=str(e),
-                request_data=self.request.data,
-            )
             raise e
 
     def perform_update(self, serializer):
@@ -104,12 +80,6 @@ class WorkHistoryViewSet(viewsets.ModelViewSet):
                 response_data=WorkHistorySerializer(work_history).data,
             )
         except Exception as e:
-            ErrorLog.objects.create(
-                user=self.request.user if self.request.user.is_authenticated else None,
-                error_message="Work history update failed",
-                stack_trace=str(e),
-                request_data=self.request.data,
-            )
             raise e
 
     def perform_destroy(self, instance):
@@ -122,12 +92,6 @@ class WorkHistoryViewSet(viewsets.ModelViewSet):
                 response_data={"id": instance.id},
             )
         except Exception as e:
-            ErrorLog.objects.create(
-                user=self.request.user if self.request.user.is_authenticated else None,
-                error_message="Work history deletion failed",
-                stack_trace=str(e),
-                request_data=self.request.data,
-            )
             raise e
 
 
@@ -147,12 +111,6 @@ class SocialMedaiViewSet(viewsets.ModelViewSet):
                 response_data=SocialMediaSerializer(socialMedia).data,
             )
         except Exception as e:
-            ErrorLog.objects.create(
-                user=self.request.user if self.request.user.is_authenticated else None,
-                error_message="SocialMedia creation failed",
-                stack_trace=str(e),
-                request_data=self.request.data,
-            )
             raise e
 
     def perform_update(self, serializer):
@@ -165,12 +123,6 @@ class SocialMedaiViewSet(viewsets.ModelViewSet):
                 response_data=SocialMediaSerializer(socialMedia).data,
             )
         except Exception as e:
-            ErrorLog.objects.create(
-                user=self.request.user if self.request.user.is_authenticated else None,
-                error_message="SocialMedia update failed",
-                stack_trace=str(e),
-                request_data=self.request.data,
-            )
             raise e
 
     def perform_destroy(self, instance):
@@ -183,12 +135,6 @@ class SocialMedaiViewSet(viewsets.ModelViewSet):
                 response_data={"id": instance.id},
             )
         except Exception as e:
-            ErrorLog.objects.create(
-                user=self.request.user if self.request.user.is_authenticated else None,
-                error_message="SocialMedia deletion failed",
-                stack_trace=str(e),
-                request_data=self.request.data,
-            )
             raise e
 
 
@@ -208,12 +154,6 @@ class UserSkillViewSet(viewsets.ModelViewSet):
                 response_data=UserSkillSerializer(user_skill).data,
             )
         except Exception as e:
-            ErrorLog.objects.create(
-                user=self.request.user if self.request.user.is_authenticated else None,
-                error_message="User Skill creation failed",
-                stack_trace=str(e),
-                request_data=self.request.data,
-            )
             raise e
 
     def perform_update(self, serializer):
@@ -226,12 +166,6 @@ class UserSkillViewSet(viewsets.ModelViewSet):
                 response_data=UserSkillSerializer(user_skill).data,
             )
         except Exception as e:
-            ErrorLog.objects.create(
-                user=self.request.user if self.request.user.is_authenticated else None,
-                error_message="User Skill update failed",
-                stack_trace=str(e),
-                request_data=self.request.data,
-            )
             raise e
 
     def perform_destroy(self, instance):
@@ -244,10 +178,4 @@ class UserSkillViewSet(viewsets.ModelViewSet):
                 response_data={"id": instance.id},
             )
         except Exception as e:
-            ErrorLog.objects.create(
-                user=self.request.user if self.request.user.is_authenticated else None,
-                error_message="User Skill deletion failed",
-                stack_trace=str(e),
-                request_data=self.request.data,
-            )
             raise e

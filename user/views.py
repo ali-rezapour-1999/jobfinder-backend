@@ -4,7 +4,7 @@ from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
-from log.models import ErrorLog, RestLog
+from log.models import RestLog
 from user.models import CustomUser
 from dj_rest_auth.registration.views import SocialLoginView
 import logging
@@ -48,11 +48,6 @@ class UserRegistrationView(generics.CreateAPIView):
                 },
                 status=status.HTTP_201_CREATED,
             )
-        ErrorLog.objects.create(
-            user=None,
-            error_message="User registration failed",
-            request_data=request.data,
-        )
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -70,11 +65,6 @@ class UserLoginView(generics.GenericAPIView):
             user = User.objects.filter(email=email).first()
 
             if not user:
-                ErrorLog.objects.create(
-                    user=None,
-                    error_message="User not found",
-                    request_data=request.data,
-                )
                 return Response(
                     {"error": "NOT_FOUND"},
                     status=status.HTTP_404_NOT_FOUND,
@@ -99,20 +89,10 @@ class UserLoginView(generics.GenericAPIView):
                         "user": {"email": user.email, "slug": user.slug_id},
                     }
                 )
-            ErrorLog.objects.create(
-                user=user,
-                error_message="Incorrect password",
-                request_data=request.data,
-            )
             return Response(
                 {"error": "PASSWORD_INVALID"},
                 status=status.HTTP_401_UNAUTHORIZED,
             )
-        ErrorLog.objects.create(
-            user=None,
-            error_message="Invalid login request data",
-            request_data=serializer.errors,
-        )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -128,6 +108,17 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         RestLog.objects.create(
             user=request.user,
             action="Get User Data",
+            request_data={},
+            response_data=serializer.data,
+        )
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=["patch"])
+    def update_me(self, request):
+        serializer = self.get_serializer(request.user)
+        RestLog.objects.update(
+            user=request.user,
+            action="اطلاعات کاربر با موفقیت ذخیره شد",
             request_data={},
             response_data=serializer.data,
         )
@@ -166,7 +157,7 @@ class GoogleLogin(SocialLoginView):
             )
 
         except Exception as e:
-            logger.error(f"Google login failed: {str(e)}")
+            print(f"Google login failed: {str(e)}")
             return Response(
                 {"error": "GOOGLE_LOGIN_FAILED"}, status=status.HTTP_400_BAD_REQUEST
             )
@@ -174,11 +165,7 @@ class GoogleLogin(SocialLoginView):
     def get_google_user_info(self, access_token):
         url = "https://www.googleapis.com/oauth2/v3/userinfo"
         headers = {"Authorization": f"Bearer {access_token}"}
-        proxies = {
-            "https": "182.253.93.3:53281",
-            "http": "182.253.93.3:53281",
-        }
-        response = requests.get(url, headers=headers, proxies=proxies)
+        response = requests.get(url, headers=headers)
         if response.status_code != 200:
             raise Exception(f"Failed to get user info from Google: {response.text}")
 

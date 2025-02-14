@@ -85,4 +85,6 @@ local_settings.py
 media/
 
 .env
+.env.local
+.env.prod
 db.sqlite3

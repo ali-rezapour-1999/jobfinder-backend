@@ -6,19 +6,15 @@ from base.models import BaseModel
 
 class ErrorLog(BaseModel):
     timestamp = models.DateTimeField(auto_now_add=True)
-    user = models.ForeignKey(
-        CustomUser, on_delete=models.SET_NULL, null=True, blank=True
-    )
-    error_message = models.TextField()
-    stack_trace = models.TextField(blank=True, null=True)
-    request_data = models.JSONField(blank=True, null=True)
+    request_path = models.CharField(max_length=512)
+    request_method = models.CharField(max_length=10)
+    request_body = models.TextField(null=True, blank=True)
+    response_status = models.IntegerField()
+    response_message = models.TextField()
+    traceback_info = models.TextField(null=True, blank=True)
 
     def __str__(self):
-        return f"Error at {self.timestamp}: {self.error_message[:40]}"
-
-    class Meta:
-        verbose_name = "error_log"
-        verbose_name_plural = "error_log"
+        return f"{self.timestamp} - {self.request_path} ({self.response_status})"
 
 
 class RestLog(BaseModel):
