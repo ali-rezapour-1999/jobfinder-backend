@@ -5,7 +5,7 @@ from .models import Profile, SocialMedia, UserSkill, WorkHistory
 
 @admin.register(SocialMedia)
 class SocialMediaAdmin(admin.ModelAdmin):
-    list_display = ("user", "is_active", "created_at")
+    list_display = ("user", "title", "is_active", "created_at")
     list_filter = ("title", "user", "is_active")
     search_fields = ("user__email", "user__phone_number", "title", "address")
     readonly_fields = ("created_at", "updated_at", "slug_id")
@@ -14,6 +14,7 @@ class SocialMediaAdmin(admin.ModelAdmin):
             "Personal Info",
             {
                 "fields": (
+                    "slug_id",
                     "user",
                     "title",
                     "address",

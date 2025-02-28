@@ -1,19 +1,8 @@
 from django.db import models
 from user.models import CustomUser
-from base.models import BaseModel
+from base.models import BaseModel, Category
 from django.utils import timezone
 from base.models import Tags
-
-
-class Category(BaseModel):
-    title = models.CharField(max_length=50, unique=True)
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        verbose_name = "category"
-        verbose_name_plural = "category"
 
 
 class Post(BaseModel):
@@ -27,9 +16,12 @@ class Post(BaseModel):
         choices=[("draft", "Draft"), ("published", "Published")],
         default="draft",
     )
-    tags = models.ManyToManyField(Tags, related_name="posts", blank=True)
+    tags = models.ManyToManyField(Tags, related_name="post_tag", blank=True)
     categories = models.ForeignKey(
-        "Category", on_delete=models.CASCADE, related_name="posts", blank=True
+        Category,
+        on_delete=models.DO_NOTHING,
+        related_name="post_category",
+        blank=True,
     )
     image = models.ImageField(upload_to="blog/%Y/%m/%d/", blank=True)
     views = models.PositiveIntegerField(default=0)
@@ -41,5 +33,5 @@ class Post(BaseModel):
 
     class Meta:
         ordering = ("-publish",)
-        verbose_name = "post"
-        verbose_name_plural = "post"
+        verbose_name = "پست"
+        verbose_name_plural = "پست"

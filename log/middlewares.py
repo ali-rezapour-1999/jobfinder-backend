@@ -1,6 +1,5 @@
 import traceback
 from django.utils.deprecation import MiddlewareMixin
-from django.http import JsonResponse
 from .models import ErrorLog
 
 
@@ -16,5 +15,3 @@ class ExceptionLoggingMiddleware(MiddlewareMixin):
             response_message=str(exception),
             traceback_info=error_traceback,
         )
-
-        return JsonResponse({"error": "خطای داخلی سرور رخ داده است."}, status=500)

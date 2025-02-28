@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
 
-python manage.py collectstatic --noinput
-python manage.py migrate --noinput
-python -m gunicorn --bind 0.0.0.0:8000 --workers 3 core.wsgi:application
+set -e
+
+echo "Running makemigrations..."
+python manage.py makemigrations
+
+echo "Running migrations..."
+python manage.py migrate
+
+echo "Starting the server..."
+python manage.py runserver 0.0.0.0:8000

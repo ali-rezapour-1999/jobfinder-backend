@@ -12,6 +12,7 @@ click-plugins==1.1.1
 click-repl==0.3.0
 cryptography==44.0.0
 defusedxml==0.8.0rc2
+dj-database-url==2.3.0
 dj-rest-auth==7.0.1
 Django==5.1.3
 django-allauth==65.4.1
@@ -46,6 +47,7 @@ six==1.17.0
 social-auth-app-django==5.4.2
 social-auth-core==4.5.4
 sqlparse==0.5.2
+typing_extensions==4.12.2
 tzdata==2025.1
 urllib3==2.2.3
 vine==5.1.0

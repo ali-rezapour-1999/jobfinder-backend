@@ -1,5 +1,5 @@
 from django.contrib import admin
-from job.models import Job, JobOption, SkillNeeded
+from job.models import Job, SkillNeeded
 
 
 @admin.register(Job)
@@ -11,12 +11,6 @@ class JobAdmin(admin.ModelAdmin):
 
 @admin.register(SkillNeeded)
 class SkillNeededAdmin(admin.ModelAdmin):
-    list_display = ("slug_id", "title", "level")
-    search_fields = ("title", "slug_id")
-    list_filter = ("level",)
-
-
-@admin.register((JobOption))
-class JobOptionsAdmin(admin.ModelAdmin):
-    list_display = ("slug_id", "title")
-    search_fields = ("title", "slug_id")
+    list_display = ("slug_id",)
+    search_fields = ("job", "slug_id")
+    list_filter = ("job",)

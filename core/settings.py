@@ -1,6 +1,7 @@
 from datetime import timedelta
 from pathlib import Path
 from dotenv import load_dotenv
+import dj_database_url
 import os
 
 load_dotenv(".env.local")
@@ -9,8 +10,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 
-DEBUG = os.environ.get("DEBUG") == "True"
+# DEBUG = os.environ.get("DEBUG") == "True"
 
+DEBUG = True
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "*").split(",")
 
 CSRF_TRUSTED_ORIGINS = os.getenv("DJANGO_CSRF_TRUSTED_ORIGINS", "*").split(",")
@@ -38,7 +40,6 @@ INSTALLED_APPS = [
     "user",
     "profiles",
     "job",
-    "jobRequest",
     "log",
     "blog",
 ]
@@ -48,7 +49,6 @@ REST_FRAMEWORK = {
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ],
 }
-
 
 # Google Auth Settings
 ACCOUNT_LOGIN_METHODS = {"email"}
@@ -131,25 +131,12 @@ WSGI_APPLICATION = "core.wsgi.application"
 
 
 # Database
-database_engine = os.getenv("DATABASE_ENGINE", "sqlite3")
 
-valid_engines = {
-    "postgresql": "django.db.backends.postgresql",
-    "sqlite3": "django.db.backends.sqlite3",
-}
-
-if database_engine not in valid_engines:
-    raise ValueError(f"Unsupported database engine: {database_engine}")
+# DATABASE_URL = "postgres://postgres:eUDrgr2tJI5XXs46@212.80.20.179:31032/db"
+DATABASE_URL = "postgres://postgres:admin@127.0.0.1:5432/jobdata"
 
 DATABASES = {
-    "default": {
-        "ENGINE": valid_engines[database_engine],
-        "NAME": os.getenv("DATABASE_NAME", "jobdata"),
-        "USER": os.getenv("DATABASE_USERNAME", "postgres"),
-        "PASSWORD": os.getenv("DATABASE_PASSWORD", "admin"),
-        "HOST": os.getenv("DATABASE_HOST", "127.0.0.1"),
-        "PORT": os.getenv("DATABASE_PORT", "5432"),
-    }
+    "default": dj_database_url.parse(DATABASE_URL, conn_max_age=600),
 }
 
 # Password validation
@@ -184,3 +171,7 @@ MEDIA_ROOT = BASE_DIR / "media"
 AUTH_USER_MODEL = "user.CustomUser"
 
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]

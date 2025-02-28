@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Post, Category
+from .models import Post
 
 
 @admin.register(Post)
@@ -35,20 +35,6 @@ class SocialMediaAdmin(admin.ModelAdmin):
                     "publish",
                 )
             },
-        ),
-        ("Other Info", {"fields": ("is_active", "created_at", "updated_at")}),
-    )
-
-
-@admin.register(Category)
-class CatagoryMediaAdmin(admin.ModelAdmin):
-    list_display = ("slug_id", "is_active", "created_at")
-    list_filter = ("title", "is_active")
-    readonly_fields = ("created_at", "updated_at", "slug_id")
-    fieldsets = (
-        (
-            "Personal Info",
-            {"fields": ("slug_id", "title")},
         ),
         ("Other Info", {"fields": ("is_active", "created_at", "updated_at")}),
     )

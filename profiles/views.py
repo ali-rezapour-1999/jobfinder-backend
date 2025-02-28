@@ -1,6 +1,9 @@
 from rest_framework import permissions, viewsets
 from log.models import RestLog
 from .models import Profile, WorkHistory, SocialMedia, UserSkill
+from rest_framework.response import Response
+from django.shortcuts import get_object_or_404
+from user.models import CustomUser
 from .serializers import (
     ProfileSerializer,
     WorkHistorySerializer,
@@ -53,7 +56,8 @@ class ProfileViewSet(viewsets.ModelViewSet):
 
 
 class WorkHistoryViewSet(viewsets.ModelViewSet):
-    queryset = WorkHistory.objects.select_related("user").filter(is_active=True)
+    queryset = WorkHistory.objects.select_related(
+        "user").filter(is_active=True)
     serializer_class = WorkHistorySerializer
     lookup_field = "user__slug_id"
     permission_classes = [permissions.AllowAny]
@@ -95,47 +99,44 @@ class WorkHistoryViewSet(viewsets.ModelViewSet):
             raise e
 
 
-class SocialMedaiViewSet(viewsets.ModelViewSet):
-    queryset = SocialMedia.objects.select_related("user").filter(is_active=True)
+class SocialMediaViewSet(viewsets.ModelViewSet):
     serializer_class = SocialMediaSerializer
-    lookup_field = "user__slug_id"
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
+
+    def get_queryset(self):
+        return SocialMedia.objects.filter(user=self.request.user)
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
     def perform_create(self, serializer):
-        try:
-            socialMedia = serializer.save()
-            RestLog.objects.create(
-                user=self.request.user if self.request.user.is_authenticated else None,
-                action="SocialMedia Created",
-                request_data=self.request.data,
-                response_data=SocialMediaSerializer(socialMedia).data,
-            )
-        except Exception as e:
-            raise e
+        social_media = serializer.save(user=self.request.user)
+        RestLog.objects.create(
+            user=self.request.user,
+            action="SocialMedia Created",
+            request_data=self.request.data,
+            response_data=SocialMediaSerializer(social_media).data,
+        )
 
     def perform_update(self, serializer):
-        try:
-            socialMedia = serializer.save()
-            RestLog.objects.create(
-                user=self.request.user if self.request.user.is_authenticated else None,
-                action="SocialMedia Updated",
-                request_data=self.request.data,
-                response_data=SocialMediaSerializer(socialMedia).data,
-            )
-        except Exception as e:
-            raise e
+        social_media = serializer.save()
+        RestLog.objects.create(
+            user=self.request.user,
+            action="SocialMedia Updated",
+            request_data=self.request.data,
+            response_data=SocialMediaSerializer(social_media).data,
+        )
 
     def perform_destroy(self, instance):
-        try:
-            instance.delete()
-            RestLog.objects.create(
-                user=self.request.user if self.request.user.is_authenticated else None,
-                action="SocialMedia Deleted",
-                request_data=self.request.data,
-                response_data={"id": instance.id},
-            )
-        except Exception as e:
-            raise e
+        instance.delete()
+        RestLog.objects.create(
+            user=self.request.user,
+            action="SocialMedia Deleted",
+            request_data=self.request.data,
+            response_data={"id": instance.id},
+        )
 
 
 class UserSkillViewSet(viewsets.ModelViewSet):

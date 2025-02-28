@@ -1,3 +1,4 @@
+from django.utils.translation import gettext_lazy as _
 from user.middleware import get_current_user
 from django.db import models
 from base.utils import generate_unique_id
@@ -38,8 +39,34 @@ class Tags(BaseModel):
     title = models.CharField(max_length=100, unique=True)
 
     class Meta:
-        verbose_name = "Tags"
-        verbose_name_plural = "Tags"
+        verbose_name = "تگ"
+        verbose_name_plural = "تگ"
+
+    def save(self, *args, **kwargs):
+        user = get_current_user()
+        if not self.pk:
+            self.create_by = user
+        self.updated_by = user
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.title
+
+
+class Category(BaseModel):
+    title = models.CharField(max_length=100, unique=True, verbose_name=_("عنوان"))
+    parent = models.ForeignKey(
+        "self",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="subcategories",
+        verbose_name=_("دسته‌بندی مادر"),
+    )
+
+    class Meta:
+        verbose_name_plural = "دسته بندی‌ها"
+        verbose_name = "دسته بندی"
 
     def save(self, *args, **kwargs):
         user = get_current_user()
