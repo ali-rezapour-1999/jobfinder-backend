@@ -22,19 +22,14 @@ class SocialMediaAdmin(admin.ModelAdmin):
                     "tags",
                     "views",
                     "image",
+                    "show_detail",
                     "is_approve",
                 )
             },
         ),
         (
             "Post",
-            {
-                "fields": (
-                    "title",
-                    "content",
-                    "publish",
-                )
-            },
+            {"fields": ("title", "content", "publish", "status")},
         ),
         ("Other Info", {"fields": ("is_active", "created_at", "updated_at")}),
     )

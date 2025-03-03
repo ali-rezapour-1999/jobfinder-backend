@@ -4,11 +4,9 @@ from base.models import BaseModel, Tags
 
 
 class Job(BaseModel):
-    user = models.ForeignKey(
-        CustomUser, on_delete=models.CASCADE, related_name="jobs")
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="jobs")
     title = models.CharField(max_length=255, null=False, blank=True)
-    job_image = models.ImageField(
-        upload_to="job_images/", null=True, blank=True)
+    job_image = models.ImageField(upload_to="job_images/", null=True, blank=True)
     description = models.TextField()
     time = models.IntegerField()
     is_approve = models.BooleanField(default=False)
@@ -23,8 +21,7 @@ class Job(BaseModel):
 
 
 class SkillNeeded(BaseModel):
-    job = models.ForeignKey(
-        Job, on_delete=models.CASCADE, related_name="skills")
+    job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name="skills")
     tags = models.ManyToManyField(Tags, related_name="jobs")
 
     def __str__(self):

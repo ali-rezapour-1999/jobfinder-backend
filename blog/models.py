@@ -23,9 +23,10 @@ class Post(BaseModel):
         related_name="post_category",
         blank=True,
     )
-    image = models.ImageField(upload_to="blog/%Y/%m/%d/", blank=True)
+    image = models.ImageField(upload_to="media/blog/%Y/%m/%d/", blank=True)
     views = models.PositiveIntegerField(default=0)
     publish = models.DateTimeField(default=timezone.now)
+    show_detail = models.BooleanField(default=True)
     is_approve = models.BooleanField(default=False)
 
     def __str__(self):

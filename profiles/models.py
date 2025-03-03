@@ -72,7 +72,7 @@ class SocialMedia(BaseModel):
     user = models.ForeignKey(
         CustomUser, on_delete=models.CASCADE, related_name="socialMedia"
     )
-    address = models.URLField(null=True, blank=True)
+    address = models.URLField(null=True, blank=True, unique=True)
     title = models.CharField(max_length=255, null=False, blank=False)
 
     class Meta:

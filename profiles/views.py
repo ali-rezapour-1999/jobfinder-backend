@@ -2,8 +2,6 @@ from rest_framework import permissions, viewsets
 from log.models import RestLog
 from .models import Profile, WorkHistory, SocialMedia, UserSkill
 from rest_framework.response import Response
-from django.shortcuts import get_object_or_404
-from user.models import CustomUser
 from .serializers import (
     ProfileSerializer,
     WorkHistorySerializer,
@@ -56,8 +54,7 @@ class ProfileViewSet(viewsets.ModelViewSet):
 
 
 class WorkHistoryViewSet(viewsets.ModelViewSet):
-    queryset = WorkHistory.objects.select_related(
-        "user").filter(is_active=True)
+    queryset = WorkHistory.objects.select_related("user").filter(is_active=True)
     serializer_class = WorkHistorySerializer
     lookup_field = "user__slug_id"
     permission_classes = [permissions.AllowAny]
@@ -101,6 +98,7 @@ class WorkHistoryViewSet(viewsets.ModelViewSet):
 
 class SocialMediaViewSet(viewsets.ModelViewSet):
     serializer_class = SocialMediaSerializer
+    lookup_field = "slug_id"
     permission_classes = [permissions.AllowAny]
 
     def get_queryset(self):
